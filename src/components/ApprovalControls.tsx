@@ -21,8 +21,8 @@ export default function ApprovalControls({ proposal, status, onDecide, disabled 
 
   if (!proposal) {
     return (
-      <Panel title="Your decision" description="Choose a proposed action to approve, reject, or ask for changes.">
-        <EmptyState message="No action selected. Pick one from Proposed actions above." />
+      <Panel title="Review a recommendation">
+        <EmptyState message="Select a recommendation to see its evidence and record a decision." />
       </Panel>
     );
   }
@@ -42,26 +42,26 @@ export default function ApprovalControls({ proposal, status, onDecide, disabled 
 
   return (
     <Panel
-      title="Your decision"
-      description="Nothing changes until you decide. Every decision is recorded in the audit history."
+      title="Your review"
       action={
         <div aria-live="polite">
           <StatusBadge status={status} />
         </div>
       }
     >
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6">
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Recommendation</p>
           <p className="mt-2 text-base font-semibold text-slate-900">{proposal.recommendation}</p>
           <p className="mt-3 text-sm text-slate-600">{proposal.summary}</p>
-          <p className="mt-4 text-xs font-medium uppercase tracking-wide text-slate-500">Evidence</p>
-          <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-slate-600">
+          <details className="review-evidence"><summary>Operational evidence · {proposal.evidence.length} observations</summary>
+          <ul className="mt-3 list-inside list-disc space-y-2 text-sm text-slate-600">
             {proposal.evidence.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
-          <PolicyPassageList agent={proposal.agent} />
+          </details>
+          <details className="review-evidence"><summary>Related policy extracts</summary><PolicyPassageList agent={proposal.agent} /></details>
         </div>
 
         <div className="flex flex-col gap-4">
@@ -120,7 +120,7 @@ export default function ApprovalControls({ proposal, status, onDecide, disabled 
           </div>
           <p className="text-xs text-slate-500">
             {busy && <span role="status">Saving decision… </span>}
-            Approving records your decision only. This dashboard does not change any clinic schedule or booking.
+            Records this review only. Schedules and bookings stay unchanged.
           </p>
         </div>
       </div>

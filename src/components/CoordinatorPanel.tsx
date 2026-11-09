@@ -12,19 +12,22 @@ interface CoordinatorPanelProps {
   onSelect: (proposal: Proposal) => void;
 }
 
+const REVIEW_LABELS = {
+  forecast: 'Waiting-time forecast',
+  routing: 'Referral destinations',
+  'task-shifting': 'Routine task options',
+  'tele-pooling': 'Specialist hour transfers',
+};
+
 export default function CoordinatorPanel({ report, statuses, selectedId, onSelect }: CoordinatorPanelProps) {
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <Panel title="Conflicts" description="Proposals that clash with the forecast or with each other.">
-        <IssueList items={report.conflicts} emptyMessage="No conflicts found for this stage." tone="warning" />
-      </Panel>
-
-      <Panel title="Gaps" description="Places where an agent or dataset had no evidence to work with.">
-        <IssueList items={report.gaps} emptyMessage="No gaps found for this stage." tone="error" />
-      </Panel>
-
-      <Panel className="lg:col-span-2" title="Proposed actions" description="Select an action to review it below.">
-        <ul className="space-y-3">
+    <div className="recommendation-sidebar">
+      <details className={`coordinator-concerns ${report.conflicts.length || report.gaps.length ? 'has-concerns' : ''}`}>
+        <summary>{report.conflicts.length} concerns · {report.gaps.length} evidence gaps</summary>
+        <div className="pt-4"><h3 className="mb-2 text-lg">Coordinator concerns</h3><IssueList items={report.conflicts} emptyMessage="No conflicts flagged." tone="warning" /><h3 className="mb-2 mt-4 text-lg">Evidence gaps</h3><IssueList items={report.gaps} emptyMessage="No evidence gaps flagged." tone="error" /></div>
+      </details>
+      <Panel title="Recommendations" description="Select one to review.">
+        <ul className="recommendation-list">
           {report.proposals.map((proposal) => {
             const status = statuses[proposal.id] ?? 'pending';
             const selected = proposal.id === selectedId;
@@ -46,7 +49,7 @@ export default function CoordinatorPanel({ report, statuses, selectedId, onSelec
                     </span>
                     <StatusBadge status={status} />
                   </div>
-                  <p className="mt-2 text-sm font-medium text-slate-900">{proposal.recommendation}</p>
+                  <p className="mt-2 text-sm font-medium text-slate-900">{REVIEW_LABELS[proposal.agent]}</p>
                 </button>
               </li>
             );

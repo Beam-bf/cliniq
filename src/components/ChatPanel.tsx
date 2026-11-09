@@ -20,10 +20,16 @@ export default function ChatPanel({ stageId, audit, adjustments, currentView, is
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const locked = useRef(false);
+  const composer = useRef<HTMLTextAreaElement>(null);
+  const wasBusy = useRef(false);
   const messageEnd = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (isOpen && messages.length) messageEnd.current?.scrollIntoView({ block: 'nearest' });
   }, [messages.length, isOpen]);
+  useEffect(() => {
+    if (isOpen && wasBusy.current && !busy) composer.current?.focus();
+    wasBusy.current = busy;
+  }, [busy, isOpen]);
   async function send(text = question) {
     if (locked.current) return;
     const problem = inputError(text);
@@ -74,7 +80,7 @@ export default function ChatPanel({ stageId, audit, adjustments, currentView, is
       </div>
       <form onSubmit={event => { event.preventDefault(); void send(); }} className="chat-composer">
         <label htmlFor="planning-question" className="sr-only">Planning question (600 characters maximum)</label>
-        <div className="chat-input-row"><textarea id="planning-question" rows={2} value={question} onChange={event => setQuestion(event.target.value)} onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); void send(); } }} placeholder="Ask about this scenario…" maxLength={600} disabled={busy} aria-describedby="chat-state" />
+        <div className="chat-input-row"><textarea ref={composer} id="planning-question" rows={2} value={question} onChange={event => setQuestion(event.target.value)} onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); void send(); } }} placeholder="Ask about this scenario…" maxLength={600} disabled={busy} aria-describedby="chat-state" />
         <button disabled={busy || !question.trim()} className="primary-button" aria-label="Send question">{busy ? '…' : 'Send'}</button></div>
         <p id="chat-state" role="status" className={error ? 'form-error' : 'field-note'}>{error ?? (busy ? 'Checking your scenario…' : 'Read-only · Enter to send, Shift+Enter for a new line')}</p>
       </form>

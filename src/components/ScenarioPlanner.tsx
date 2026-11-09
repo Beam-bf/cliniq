@@ -13,7 +13,7 @@ export default function ScenarioPlanner({ stage, adjustments, disabled, onApply,
   const record = stage.records.find(item => item.clinicId === clinic && item.specialtyId === specialty)!;
   const forecast = forecastWait(record, stage.seasonalFactorBySpecialty[specialty]);
   return <section aria-labelledby="planner-title">
-    <div className="page-heading"><h2 id="planner-title">What would you change?</h2><p className="page-intro">Adjust one clinic and specialty. Apply the values to recalculate the rule-based findings.</p></div>
+    <div className="page-heading"><h2 id="planner-title">Adjust a scenario</h2><p className="page-intro">Choose a clinic and specialty to explore.</p></div>
     <div className="planner-selectors">
       <label>Clinic<select value={clinic} onChange={event => setClinic(event.target.value as typeof clinic)}>{CLINIC_IDS.map(id => <option key={id} value={id}>{CLINIC_NAMES[id]}</option>)}</select></label>
       <label>Specialty<select value={specialty} onChange={event => setSpecialty(event.target.value as typeof specialty)}>{SPECIALTY_IDS.map(id => <option key={id} value={id}>{SPECIALTY_LABELS[id]}</option>)}</select></label>
@@ -25,7 +25,7 @@ export default function ScenarioPlanner({ stage, adjustments, disabled, onApply,
       <dl className="planner-facts"><div><dt>Free hours / week</dt><dd>{record.freeSpecialistHoursPerWeek}</dd></div><div><dt>Referrals / week</dt><dd>{record.referralsPerWeek}</dd></div></dl>
       <button className="text-button" onClick={onFindings}>See all agent findings →</button>
     </div><RecordEditor key={`${recordKey(clinic, specialty)}:${latestWaitWeeks(record)}:${record.freeSpecialistHoursPerWeek}:${record.referralsPerWeek}`} record={record} stage={stage} adjustments={adjustments} disabled={disabled} onApply={onApply} /></div>
-    <p className="planner-limit">Changing available hours may change routing and tele-pooling. Forecasts change only when waiting-time inputs change. This tool does not simulate the effect of extra hours on future waiting times.</p>
+    <details className="progressive-details"><summary>How changes affect the findings</summary><p className="planner-limit">Changing available hours may change routing and tele-pooling. Forecasts change only when waiting-time inputs change. This tool does not simulate the effect of extra hours on future waiting times.</p></details>
   </section>;
 }
 
@@ -46,7 +46,7 @@ function RecordEditor({ record, stage, adjustments, disabled, onApply }: { recor
     <label>Free specialist hours <span>per week</span><input type="number" min="0" max="168" step="0.5" required value={hours} disabled={disabled || busy} onChange={event => setHours(event.target.value)} /></label>
     <label>Referrals <span>per week</span><input type="number" min="0" max="10000" step="1" required value={referrals} disabled={disabled || busy} onChange={event => setReferrals(event.target.value)} /></label>
     <button className="primary-button" disabled={disabled || busy}>{busy ? 'Applying…' : 'Apply & recalculate'}</button>
-    <p className="field-note">Changed inputs create a separate review version. Existing approvals do not carry across to it.</p>
+    <p className="field-note">Different inputs use separate reviews.</p>
     {error && <p className="form-error" role="alert">{error}</p>}{saved && <p role="status" className="text-sm">Values applied. Agent findings have been recalculated.</p>}
   </form>;
 }

@@ -15,6 +15,8 @@
 
 - Stack: React + TypeScript + Tailwind (Vite), Lucide React icons, `@/` import alias.
 - User selected direction A, Paper briefing, then rejected the density and requested functional website elements. The workspace now has Overview, Planner, Decisions, Evidence, History, Help and Account hash routes. Overview is brief; deep evidence/limitations are progressively disclosed. Ivory/forest palette remains.
+- Latest user preference: focus on content and design first; defer backend activation. A further content pass shortens Overview/Planner copy and gives Decisions a side-by-side recommendation/review layout with expandable evidence and coordinator concerns. No competition judging criteria supplied yet; do not imply a guaranteed winning design.
+- Current local workstream branch is feature/content-design. The previously approved initial main upload is complete; later branch changes remain local until upload is authorized. User and friend will work on separate task branches.
 - Read-only chat is now a nonmodal bottom-right widget with launcher, Escape close/focus return, suggestion sends and source-card navigation. Context includes applied what-if changes and current view. Full LLM system instruction lives in functions/_lib/chatPrompt.ts.
 - Responsive grids throughout; status conveyed by color plus numeric value (never color-only).
 - Accessibility baseline established: skip-to-main link, `main` landmark with id, `aria-labelledby` on all sections, `aria-pressed` on toggle buttons, `aria-live` for decision status announcements, `aria-describedby` linking reason-field errors, `scope` on table headers, reduced-motion handling in CSS.

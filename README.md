@@ -6,7 +6,7 @@ An interactive specialist-capacity planning demo for six fictional Dubai clinics
 
 - **Overview:** see a short planning snapshot, forecast pressure and the next useful action. Expand the full indicators only when needed.
 - **Planner:** select a clinic/specialty, edit fictional current waiting weeks, available hours and referrals, then apply and recalculate the four fixed-rule agents. This edits scenario inputs; it does not simulate how added hours change future waits.
-- **Decisions:** inspect coordinator concerns, select a recommendation and record approval, rejection or a request for changes with a reason. Reviews are attached to the exact scenario-input version. A changed plan needs its own review.
+- **Decisions:** select a recommendation from the compact list and review it alongside the decision form. Concern counts stay visible; expand them, operational evidence and policy extracts when needed. Reviews are attached to the exact scenario-input version. A changed plan needs its own review.
 - **Evidence:** search the existing source list. Quotes and summaries stay visible; publisher details are expandable. Unverified sources are excluded from retrieval.
 - **History:** search recorded decisions and chat summaries, filter by scenario, and refresh connected-account records.
 - **Help:** short walkthrough, privacy/storage information, expandable limitations and draft ITU concept alignment.

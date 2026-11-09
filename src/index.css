@@ -172,6 +172,17 @@
   .workspace-loading { padding: 42px 0; }
   .workspace-loading h2 { font-size: 28px; }
   .workspace-loading p { margin: 18px 0; font-size: 13px; color: var(--muted); }
+  .decision-workspace { display: grid; grid-template-columns: minmax(250px, .8fr) minmax(0, 1.2fr); gap: 36px; align-items: start; }
+  .recommendation-sidebar { min-width: 0; }
+  .coordinator-concerns { margin-bottom: 24px; padding: 14px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); font-size: 12px; }
+  .coordinator-concerns > summary { color: var(--muted); }
+  .coordinator-concerns.has-concerns > summary { color: #855314; }
+  .recommendation-list { display: flex; flex-direction: column; gap: 10px; }
+  .recommendation-list button { border-radius: 5px; }
+  .recommendation-list button[aria-pressed='true'] { border-left: 3px solid var(--forest); }
+  .recommendation-list button .status-badge { font-size: 9px; padding: 3px 6px; }
+  .review-evidence { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--rule); font-size: 12px; }
+  .review-evidence > summary { color: var(--forest); }
   .briefing-footer { display: flex; flex-wrap: wrap; gap: 14px 22px; padding-bottom: 70px; }
   .briefing-footer span { flex: 1; }
   .briefing-footer a { color: var(--forest); }
@@ -210,6 +221,7 @@
 }
 
 @media (max-width: 1099px) {
+  .decision-workspace { grid-template-columns: 1fr; gap: 26px; }
   .workspace-header { align-items: start; }
   .workspace-header-actions { gap: 8px; }
   .connection-label { flex-basis: 100%; text-align: right; }

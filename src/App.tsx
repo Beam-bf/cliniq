@@ -125,9 +125,11 @@ function App() {
           {workspaceBlocked && !['account', 'help'].includes(page) ? <div className="workspace-loading" role="status">{account.error ? <><h2>We couldn’t load your saved workspace</h2><p>{account.error}</p><button className="primary-button" onClick={() => void account.reload()}>Retry connection</button></> : <p>Loading your workspace…</p>}</div> : <>
           {page === 'overview' && <Overview stage={stage} report={report} statuses={statuses} changedCount={Object.keys(adjustments).length} onPlan={() => go('planner')} onReview={review} />}
           {page === 'planner' && <ScenarioPlanner key={`${auth.session?.user.id ?? 'demo'}:${stageId}`} stage={stage} adjustments={adjustments} disabled={workspaceBlocked} onApply={applyPlan} onFindings={() => review()} />}
-          {page === 'decisions' && <div className="decisions-page"><div className="page-heading"><h2>Review before you decide</h2><p className="page-intro">Choose a recommendation, inspect its evidence, and record your review.</p></div>
-            <CoordinatorPanel report={report} statuses={statuses} selectedId={selectedId} onSelect={proposal => { setSelectedId(proposal.id); setNotice(null); requestAnimationFrame(() => document.getElementById('decision-detail')?.scrollIntoView({ block: 'start' })); }} />
-            <div id="decision-detail" className="mt-8"><ApprovalControls key={selected?.id ?? 'none'} proposal={selected} status={selectedStatus} onDecide={recordDecision} disabled={workspaceBlocked} /></div>
+          {page === 'decisions' && <div className="decisions-page"><div className="page-heading"><h2>Review recommendations</h2></div>
+            <div className="decision-workspace">
+            <CoordinatorPanel report={report} statuses={statuses} selectedId={selectedId} onSelect={proposal => { setSelectedId(proposal.id); setNotice(null); if (window.matchMedia('(max-width: 1099px)').matches) requestAnimationFrame(() => document.getElementById('decision-detail')?.scrollIntoView({ block: 'start' })); }} />
+            <div id="decision-detail"><ApprovalControls key={selected?.id ?? 'none'} proposal={selected} status={selectedStatus} onDecide={recordDecision} disabled={workspaceBlocked} /></div>
+            </div>
             <details className="progressive-details"><summary>How the four agents reached their findings</summary><div className="pt-5"><AgentCards proposals={report.proposals} statuses={statuses} /></div></details>
           </div>}
           {page === 'evidence' && <PolicyEvidencePanel focusSourceId={source} />}
