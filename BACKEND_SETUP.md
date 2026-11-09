@@ -1,6 +1,6 @@
 # Activate the account backend
 
-The local implementation is prepared; no cloud project, environment configuration or database has been changed. It uses the existing Supabase dependency, not a simulated account system. A Supabase project is required to activate it.
+The local implementation uses the existing Supabase dependency. On 10 November 2026, the supplied project URL and public publishable key were configured in ignored `.env.local` and `.dev.vars` files. The project responds and reports email sign-in, sign-up and email confirmation enabled. The user applied the migration: all three tables now deny anonymous queries, and the supplied SQL result confirms row-level security enabled with 3 plan policies, 2 decision policies and 2 chat policies. Real sign-in, saving and cross-account isolation still need verification. No accounts or emails were created by the assistant's checks.
 
 ## 1. Create or select the project
 
@@ -20,17 +20,17 @@ Tables:
 
 All tables enable row-level security. Anonymous access is revoked. Authenticated read/insert policies require `auth.uid() = user_id`. Plan updates enforce the same owner check; decision/chat update/delete access is not granted. No service-role key is needed by this app. Supabase's [row-level security guide](https://supabase.com/docs/guides/database/postgres/row-level-security) explains how database policies enforce this boundary.
 
-The SQL validates top-level types, enums, lengths, owner references, and allowed source IDs. Detailed planning bounds are also checked by the client/server scenario validator. This is a personal workspace model; it does not implement organizations, administrator/reviewer roles or shared team access.
+The original SQL configures personal workspaces. Shared teams and Admin/Planner/Reviewer roles use the separate additive migration and setup in [TEAM_SETUP.md](TEAM_SETUP.md). Do not rerun the original personal migration to enable teams. Team planning bounds are checked inside the database as well as the app.
 
 ## 3. Configure authentication
 
 Enable email/password authentication, review your project's password policy, and keep email confirmation enabled for normal sign-up. Configure the site's URL and an explicit redirect allow-list for the origins you actually use, such as your local Vite URL and future hosted URL. The app redirects confirmation/reset links to its root and handles recovery events by showing a new-password form. Production email delivery may require your own SMTP configuration; review your provider's current delivery limits.
 
-The app implements sign-up, sign-in, sign-out, reset email and password update using the documented [password authentication flows](https://supabase.com/docs/guides/auth/passwords). Account email/password go to Supabase Auth, never the chatbot. No OAuth providers, MFA or team-role controls are configured by this increment.
+The app implements sign-up, sign-in, sign-out, reset email and password update using the documented [password authentication flows](https://supabase.com/docs/guides/auth/passwords). Account email/password go to Supabase Auth, never the chatbot. No OAuth providers or MFA are configured. Team roles are stored in database membership, not editable signup metadata, and need their own migration/first-Admin setup.
 
 ## 4. Configure the client build
 
-Supply `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` to Vite through your local environment or build settings, then restart/rebuild. The values are public client configuration. Do not expose any privileged key. No environment variables or `.env` files have been set here.
+Supply `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` to Vite through your local environment or build settings, then restart/rebuild. These public values are now configured locally in ignored `.env.local`; future hosting still needs its own build configuration. Do not expose any privileged key.
 
 Without both valid values, the app clearly stays in browser demo mode. With them present, Account enables the real forms. Missing database tables/policies produce a workspace connection error with Retry; the app does not silently save account records into the demo.
 
@@ -38,7 +38,7 @@ Without both valid values, the app clearly stays in browser demo mode. With them
 
 Supply matching server variables `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` to the Pages function. It verifies the bearer token with `/auth/v1/user`, then fetches the saved plan and recent decisions under that user's token. Browser-supplied account adjustments/audit are replaced. Expired tokens are rejected; a missing or broken database does not produce an authenticated live answer.
 
-Live LLM calls additionally need `AI_PROVIDER=cloudflare`, `AI_API_KEY`, `AI_ACCOUNT_ID` and `AI_MODEL`. Keep these server-only, with no `VITE_` prefix. Plain `npm run dev` does not execute the Pages function and continues to use offline templates. No keys have been supplied or tested.
+Live LLM calls additionally need `AI_PROVIDER=cloudflare`, `AI_API_KEY`, `AI_ACCOUNT_ID` and `AI_MODEL`. Keep these server-only, with no `VITE_` prefix. Plain `npm run dev` does not execute the Pages function and continues to use offline templates. No model API key has been supplied or tested.
 
 ## 6. Verify before claiming activation
 

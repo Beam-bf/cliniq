@@ -38,7 +38,7 @@ export default function AuditHistory({ entries, chatEntries }: AuditHistoryProps
                   <td className="whitespace-nowrap px-5 py-4 font-medium text-slate-800 sm:px-6">
                     {AGENT_CATALOG[entry.agent].name}
                   </td>
-                  <td className="px-5 py-4 text-slate-600 sm:px-6"><p>{SCENARIO_STAGES[entry.stage].label.replace(/^Stage \d /, '')}</p><p className="mt-1 text-xs">{entry.planRevision && entry.planRevision !== 'original' ? 'What-if version' : 'Original scenario'}</p></td>
+                  <td className="px-5 py-4 text-slate-600 sm:px-6"><p>{SCENARIO_STAGES[entry.stage].label.replace(/^Stage \d /, '')}</p><p className="mt-1 text-xs">{entry.submissionId ? `Submission ${entry.submissionId.slice(0, 8)}` : entry.planRevision && entry.planRevision !== 'original' ? 'What-if version' : 'Original scenario'}</p>{entry.actorId && <p className="mt-1 text-xs" title={entry.actorId}>Reviewer {entry.actorId.slice(0, 8)}</p>}</td>
                   <td className="min-w-[220px] px-5 py-4 text-slate-700 sm:px-6">{entry.summary}</td>
                   <td className="min-w-[160px] px-5 py-4 text-slate-600 sm:px-6"><details><summary className="text-teal-700">View evidence</summary><p className="mt-3 max-w-sm">{entry.evidence}</p></details></td>
                   <td className="px-5 py-4 sm:px-6">

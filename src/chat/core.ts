@@ -5,6 +5,7 @@ import { coordinateStage } from '@/agents/coordinator';
 import type { StageId } from '@/types';
 import { applyAdjustments, summarizeStage } from '@/planning/scenarioPlanning';
 import type { ScenarioAdjustments } from '@/planning/scenarioPlanning';
+import type { TeamRole } from '@/teams/types';
 
 export interface ChatTurn { role: 'user' | 'assistant'; content: string }
 export interface ChatAudit {
@@ -16,6 +17,9 @@ export interface ChatRequest {
   recentAudit?: { stage: StageId; agent: string; decision: string }[];
   adjustments?: ScenarioAdjustments;
   currentView?: string;
+  teamId?: string;
+  submissionId?: string;
+  teamRole?: TeamRole;
 }
 export interface ChatAnswer { answer: string; sourceIds: string[]; mode: 'live' | 'offline'; notice?: string }
 export const LIMITS = 'Limits / uncertainty: fictional scenario data; fixed rules and short policy extracts only. No medical advice or action taken.';
@@ -44,7 +48,10 @@ export function buildContext(request: ChatRequest) {
   const report = coordinateStage(stage, runAllAgents(stage));
   return {
     label: 'FICTIONAL scenario data', stage,
-    currentView: ['overview', 'planner', 'decisions', 'evidence', 'history', 'help', 'account'].includes(request.currentView ?? '') ? request.currentView : 'overview',
+    currentView: ['overview', 'planner', 'decisions', 'evidence', 'history', 'team', 'help', 'account'].includes(request.currentView ?? '') ? request.currentView : 'overview',
+    workspace: { kind: request.teamId ? 'team' : 'personal', teamId: request.teamId,
+      role: ['admin','planner','reviewer'].includes(request.teamRole ?? '') ? request.teamRole : undefined,
+      submissionId: request.submissionId, note: 'Recorded decisions are reviews of saved submissions, never actions on real schedules.' },
     summary: summarizeStage(stage),
     whatIfChanges: request.adjustments ?? {},
     agents: report.proposals, conflicts: report.conflicts, gaps: report.gaps,

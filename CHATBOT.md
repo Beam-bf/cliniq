@@ -24,6 +24,8 @@ For a connected account, the function verifies the access token with Supabase Au
 
 The context includes applied records, totals, forecasts, agent evidence/recommendations, coordinator conflicts/gaps, recent decision metadata, retrieved passage IDs/text and current navigation view. History helps interpret follow-ups; it is not a new source of facts.
 
+For shared teams, context also includes the role verified from database membership and the selected submitted version. The server rejects nonmembers and reads snapshots within the verified team. Browser role claims are replaced. The system prompt explains Planner/Reviewer/Admin permissions and the distinction between a mutable draft and an immutable submission. The assistant remains read-only; team chat audit notes are author-private. See TEAM_SETUP.md.
+
 ## Live provider configuration
 
 Cloudflare Pages Functions is the proposed host; no actual host was identifiable in the export. Use server-only `AI_PROVIDER=cloudflare`, `AI_API_KEY`, `AI_ACCOUNT_ID` and `AI_MODEL`. Other provider adapters are not implemented. Use a currently available text model, for example `@cf/meta/llama-3.2-3b-instruct`, after checking availability for your account. Never prefix privileged keys with `VITE_`.
@@ -44,4 +46,4 @@ Chat questions, used source IDs and visible answer summaries are logged to the c
 
 ## Verification
 
-Sixteen tests cover chat and planning boundaries, including real repository payload construction with mocked network/database responses. An isolated Chrome session tested open/close behavior, contextual offline answers, clinical-input rejection, citations and source focus, browser audit persistence, and mobile bounds. Real API credentials, hosted function behavior, email delivery and live database policies remain unverified until configuration.
+Thirty automated checks cover chat/planning boundaries, membership-scoped model context and team policies executed in an embedded PostgreSQL engine. Isolated Chrome checks cover ordinary chat behavior and mocked team-role workflows. Real model calls, hosted function behavior and hosted team policies remain unverified until configuration/migration. Existing personal sign-in was demonstrated by the user; complete cross-account testing remains outstanding.

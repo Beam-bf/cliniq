@@ -18,7 +18,7 @@ Done means: a reviewer can reconstruct the figures behind any old decision and c
 
 Introduce organizations, memberships and permission checks for owner, planner, reviewer and read-only viewer roles. Store reviewer assignments and decision state on the backend, and apply authorization to every server/database path. Add an in-app review inbox and activity updates. Design any external email notifications separately before enabling sends.
 
-Done means: a planner can submit a version for an assigned reviewer; viewers cannot write decisions; nobody can grant themselves a privileged role. Current accounts are personal workspaces, without team roles.
+Admin/Planner/Reviewer membership and immutable submitted snapshots are now implemented locally, with database policy tests. Activation and real cross-account checks are next; see TEAM_SETUP.md. Assigned-reviewer routing, viewer roles, live activity updates and notification delivery remain future work.
 
 ## Priority 4 — Accept useful aggregate input
 

@@ -37,11 +37,11 @@ Vite serves the client only. Its dev and preview commands do not run Cloudflare 
 
 ## Working together
 
-The shared repository is https://github.com/Beam-bf/halacapacity-ai. See [CONTRIBUTING.md](CONTRIBUTING.md) for cloning, separate task branches, checks and pull requests. Local changes become available to collaborators after they are pushed. Account data sharing is separate from code collaboration: the current backend gives each user a personal workspace.
+The shared repository is https://github.com/Beam-bf/halacapacity-ai. See [CONTRIBUTING.md](CONTRIBUTING.md) for cloning, separate task branches, checks and pull requests. Local changes become available to collaborators after they are pushed. Account data sharing is separate from code collaboration: personal workspaces stay private; shared team workspaces require the new migration and initial Admin setup described in [TEAM_SETUP.md](TEAM_SETUP.md).
 
 ## Backend and account activation
 
-Supabase is now an active integration, using the dependency already in the project. The app contains auth flows, an account-scoped repository, database migration with row-level security, and server-side session verification for account chat context. **No Supabase project is connected yet**, and no migration has been executed against a real database. See [BACKEND_SETUP.md](BACKEND_SETUP.md) for the exact activation steps.
+Supabase is now an active integration, using the dependency already in the project. The app contains auth flows, an account-scoped repository, database migration with row-level security, and server-side session verification for account chat context. **The public project connection is configured locally**, and authentication settings respond successfully. The user created the three planning tables; row-level security is enabled and anonymous reads are denied. Real account/save and isolation tests remain outstanding. See [BACKEND_SETUP.md](BACKEND_SETUP.md) for activation steps.
 
 Public browser build configuration:
 
@@ -50,7 +50,7 @@ Public browser build configuration:
 | `VITE_SUPABASE_URL` | Supabase project URL. |
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | Public publishable key (or legacy anon key), never a service-role/secret key. |
 
-These are build-time values, so adding them requires restarting Vite/rebuilding the client. No environment files or variables were created or changed during implementation.
+These are build-time values, so adding them requires restarting Vite/rebuilding the client. Local `.env.local` now contains the supplied public connection details and is ignored by Git. Server `.dev.vars` contains the corresponding public configuration for future local Pages testing. Hosting environments remain unconfigured.
 
 Server function configuration:
 
@@ -68,6 +68,10 @@ Cloudflare Pages Functions remains the proposed function host because the export
 The browser demo remains available without an account. Configured but signed-out browser clients use local offline chat. A server configured for accounts requires a valid session for connected chat. The function verifies that session through Supabase Auth, then reads the caller's saved plan and recent decision metadata under their own row-level policies, replacing any client-supplied account plan/audit. Passwords, API keys and decision reasons are not sent to the model.
 
 ## Persistence and review versions
+
+### Team workspaces
+
+The Team page and workspace selector support Admin, Planner and Reviewer roles. Planners apply and submit saved inputs; Reviewers decide against immutable submitted snapshots; Admins manage membership and can perform both workflows. Database policies and guarded RPCs enforce these boundaries. Nobody can self-select Admin at signup. Existing personal data is untouched. Team decisions are shared; team chat notes are private to their author. See [TEAM_SETUP.md](TEAM_SETUP.md) for the additive migration, first-Admin setup and remaining hosted verification.
 
 Demo plans/statuses/history use `localStorage` keys prefixed `halacapacity.`. Signed-in workspaces use three account-specific tables: `planning_plans`, `planning_decisions`, and `planning_chat_audit`. Demo records are not imported into an account automatically, and account data is not copied back to demo storage when signing out. A failed account save surfaces an error instead of silently saving to demo storage.
 
@@ -92,7 +96,7 @@ See [CHATBOT.md](CHATBOT.md) for retrieval, limits, provider configuration, and 
 
 ## Verification
 
-Lint, frontend/server typechecks, **16 automated tests**, and the Vite production build pass. A separate server-bundle smoke check returns offline summaries for all three scenarios. Tests cover retrieval, citations, reasoning-block removal, mocked model failures, input screening, adjusted-scenario calculations, review identities, guiding-prompt context, token rejection, authenticated-context replacement, database owner filters, chat-audit inserts and save failures.
+The suite now includes **30 automated checks**, with real PostgreSQL policy tests through the development-only PGlite dependency, in addition to retrieval, chat, planning and repository tests. The team tests check signup privilege escalation, cross-team isolation, role-specific writes, last-Admin protection, immutable snapshots and author-private chat. Browser role workflows use intercepted service responses; see TEAM_SETUP.md for the exact verification boundary.
 
 An isolated installed-Chrome session verified page navigation, a real demo approval, input editing/recalculation, review invalidation after editing, the floating assistant, Escape close/focus return, contextual offline answers, clinical-input rejection, repeated source navigation/focus, JSON export content, persisted history after reload, scenario isolation and the unconfigured account state. The page and widget fit the tested 390×844 mobile viewport. Screenshots are in ignored `.browser-qa/`. No new browser/test packages were installed.
 
@@ -102,4 +106,4 @@ Live Supabase email/session flows, database migrations/RLS execution, a hosted C
 
 Operational figures and task assignments are fictional. The four agents are fixed rules; forecast confidence indicates straight-line fit only. Changing referral/hour inputs does not model future clinical outcomes. Original policy verification flags are inherited, and a keyword match is not proof of policy support. ITU alignment remains a draft concept comparison, with unverified applicability/metrics labelled in the app.
 
-Start with backend/provider activation and cross-account verification. Then add named/versioned planning runs, team roles and reviewer assignment, validated aggregate CSV import, and a measured demand/capacity model. The recommended functional roadmap is in [PRODUCT_ROADMAP.md](PRODUCT_ROADMAP.md).
+Start with applying the team migration, assigning the intended first Admin and verifying real cross-account behavior. Then activate the model provider and add named planning runs, reviewer assignment, validated aggregate CSV import, and a measured demand/capacity model. The recommended functional roadmap is in [PRODUCT_ROADMAP.md](PRODUCT_ROADMAP.md).
