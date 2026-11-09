@@ -1,0 +1,183 @@
+{
+  "referenceYear": 2024,
+  "geography": "Emirate of Dubai",
+  "sourceUrl": "https://www.dha.gov.ae/uploads/122025/Dubai%20Health%20Statistical%20Yearbook_202420251248281.pdf",
+  "accessedDate": "2026-11-10",
+  "method": "Descriptive snapshot. Shares = category count / its own table total * 100. Display rounded to two decimals.",
+  "checks": {
+    "tableTotalsReconciled": true,
+    "physicianSubsetReconciled": true
+  },
+  "groups": [
+    {
+      "id": "facilities",
+      "title": "Licensed health facilities",
+      "table": 10,
+      "pdfPage": 40,
+      "unit": "licensed facilities",
+      "reportedTotal": 5372,
+      "categories": [
+        {
+          "id": "polyclinics",
+          "label": "Polyclinics",
+          "count": 1665,
+          "sharePercent": 30.99
+        },
+        {
+          "id": "pharmacies",
+          "label": "Pharmacies",
+          "count": 1588,
+          "sharePercent": 29.56
+        },
+        {
+          "id": "optical_centers",
+          "label": "Optical centers",
+          "count": 473,
+          "sharePercent": 8.8
+        },
+        {
+          "id": "school_clinics",
+          "label": "School clinics",
+          "count": 422,
+          "sharePercent": 7.86
+        },
+        {
+          "id": "clinical_support",
+          "label": "Clinical support facilities",
+          "count": 249,
+          "sharePercent": 4.64
+        },
+        {
+          "id": "home_healthcare",
+          "label": "Home healthcare agencies",
+          "count": 196,
+          "sharePercent": 3.65
+        },
+        {
+          "id": "general_clinics",
+          "label": "General clinics",
+          "count": 138,
+          "sharePercent": 2.57
+        },
+        {
+          "id": "tcam",
+          "label": "Traditional, complementary and alternative medicine facilities",
+          "count": 92,
+          "sharePercent": 1.71
+        },
+        {
+          "id": "specialty_clinics",
+          "label": "Specialty clinics/centers",
+          "count": 87,
+          "sharePercent": 1.62
+        },
+        {
+          "id": "dental_general_clinics",
+          "label": "Dental general clinics",
+          "count": 75,
+          "sharePercent": 1.4
+        },
+        {
+          "id": "dental_laboratories",
+          "label": "Dental laboratories",
+          "count": 70,
+          "sharePercent": 1.3
+        },
+        {
+          "id": "day_surgery",
+          "label": "Day surgery centers",
+          "count": 60,
+          "sharePercent": 1.12
+        },
+        {
+          "id": "hospitals",
+          "label": "Hospitals",
+          "count": 57,
+          "sharePercent": 1.06
+        },
+        {
+          "id": "others",
+          "label": "Others",
+          "count": 200,
+          "sharePercent": 3.72
+        }
+      ]
+    },
+    {
+      "id": "workforce",
+      "title": "Licensed health workforce by job category",
+      "table": 11,
+      "pdfPage": 42,
+      "unit": "licensed workforce count",
+      "reportedTotal": 66070,
+      "categories": [
+        {
+          "id": "physicians",
+          "label": "Physicians",
+          "count": 14861,
+          "sharePercent": 22.49
+        },
+        {
+          "id": "dentists",
+          "label": "Dentists",
+          "count": 4580,
+          "sharePercent": 6.93
+        },
+        {
+          "id": "pharmacists",
+          "label": "Pharmacists",
+          "count": 6633,
+          "sharePercent": 10.04
+        },
+        {
+          "id": "nurses",
+          "label": "Nurses",
+          "count": 25066,
+          "sharePercent": 37.94
+        },
+        {
+          "id": "allied",
+          "label": "Allied healthcare professionals",
+          "count": 14930,
+          "sharePercent": 22.6
+        }
+      ]
+    },
+    {
+      "id": "physicians",
+      "title": "Licensed physicians by job category",
+      "table": 12,
+      "pdfPage": 46,
+      "unit": "licensed physician count",
+      "reportedTotal": 14861,
+      "categories": [
+        {
+          "id": "consultants",
+          "label": "Consultants",
+          "count": 3396,
+          "sharePercent": 22.85
+        },
+        {
+          "id": "specialists",
+          "label": "Specialists",
+          "count": 6642,
+          "sharePercent": 44.69
+        },
+        {
+          "id": "resident_gp_privileges",
+          "label": "Resd. - G.P. - Priv. (source grouping)",
+          "count": 4823,
+          "sharePercent": 32.45
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "A single 2024 aggregate snapshot, not live data or a time series.",
+    "Licensed workforce counts do not measure FTEs, worked hours, vacancies or spare capacity.",
+    "Physician categories are a subset of workforce, not additional personnel to add to it.",
+    "Facility counts include pharmacies and other facility types; they are not all hospitals or specialist clinics.",
+    "These tables do not provide the clinic/specialty waiting histories, referrals and available hours required by the existing simulation.",
+    "No shortage, transfer recommendation, seasonal effect, waiting-time forecast or clinical benefit is established by this analysis."
+  ]
+}

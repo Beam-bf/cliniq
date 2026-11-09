@@ -1,0 +1,63 @@
+{
+  "publisher": "Dubai Health Authority",
+  "title": "Dubai Health Statistical Yearbook 2024",
+  "url": "https://www.dha.gov.ae/uploads/122025/Dubai%20Health%20Statistical%20Yearbook_202420251248281.pdf",
+  "referenceYear": 2024,
+  "geography": "Emirate of Dubai",
+  "accessedDate": "2026-11-10",
+  "extraction": "Manual transcription of published aggregate table totals; no patient records. PDF pages below are one-based.",
+  "groups": [
+    {
+      "id": "facilities",
+      "title": "Licensed health facilities",
+      "table": 10,
+      "pdfPage": 40,
+      "unit": "licensed facilities",
+      "reportedTotal": 5372,
+      "categories": [
+        { "id": "polyclinics", "label": "Polyclinics", "count": 1665 },
+        { "id": "pharmacies", "label": "Pharmacies", "count": 1588 },
+        { "id": "optical_centers", "label": "Optical centers", "count": 473 },
+        { "id": "school_clinics", "label": "School clinics", "count": 422 },
+        { "id": "clinical_support", "label": "Clinical support facilities", "count": 249 },
+        { "id": "home_healthcare", "label": "Home healthcare agencies", "count": 196 },
+        { "id": "general_clinics", "label": "General clinics", "count": 138 },
+        { "id": "tcam", "label": "Traditional, complementary and alternative medicine facilities", "count": 92 },
+        { "id": "specialty_clinics", "label": "Specialty clinics/centers", "count": 87 },
+        { "id": "dental_general_clinics", "label": "Dental general clinics", "count": 75 },
+        { "id": "dental_laboratories", "label": "Dental laboratories", "count": 70 },
+        { "id": "day_surgery", "label": "Day surgery centers", "count": 60 },
+        { "id": "hospitals", "label": "Hospitals", "count": 57 },
+        { "id": "others", "label": "Others", "count": 200 }
+      ]
+    },
+    {
+      "id": "workforce",
+      "title": "Licensed health workforce by job category",
+      "table": 11,
+      "pdfPage": 42,
+      "unit": "licensed workforce count",
+      "reportedTotal": 66070,
+      "categories": [
+        { "id": "physicians", "label": "Physicians", "count": 14861 },
+        { "id": "dentists", "label": "Dentists", "count": 4580 },
+        { "id": "pharmacists", "label": "Pharmacists", "count": 6633 },
+        { "id": "nurses", "label": "Nurses", "count": 25066 },
+        { "id": "allied", "label": "Allied healthcare professionals", "count": 14930 }
+      ]
+    },
+    {
+      "id": "physicians",
+      "title": "Licensed physicians by job category",
+      "table": 12,
+      "pdfPage": 46,
+      "unit": "licensed physician count",
+      "reportedTotal": 14861,
+      "categories": [
+        { "id": "consultants", "label": "Consultants", "count": 3396 },
+        { "id": "specialists", "label": "Specialists", "count": 6642 },
+        { "id": "resident_gp_privileges", "label": "Resd. - G.P. - Priv. (source grouping)", "count": 4823 }
+      ]
+    }
+  ]
+}

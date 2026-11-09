@@ -17,6 +17,10 @@ Four interview questions to use later:
 
 Record actual responses accurately and obtain permission before quoting someone in the pitch. Until then, keep validation labelled pending.
 
+## Real-data analysis
+
+Backend development is currently on hold. A first descriptive analysis uses Dubai Health Authority's published **2024** workforce and facility tables: [analysis report](analysis/dubai-2024/REPORT.md), [CSV](analysis/dubai-2024/results.csv), and [source/provenance](analysis/dubai-2024/source-data.json). Reproduce it with `node analysis/dubai-2024/analyze.mjs`. All three table totals and the physician subset reconcile. These are regional licensed-resource counts; they do not establish clinic waiting times or spare specialist hours. The website's fictional scenarios remain labelled as such.
+
 ## What you can do
 
 - **Overview:** see a short planning snapshot, forecast pressure and the next useful action. Expand the full indicators only when needed.

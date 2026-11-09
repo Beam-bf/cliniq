@@ -2,6 +2,8 @@
 
 ## Current user direction
 
+- User has now put backend work on hold and requested real-data analysis. Do not continue backend setup or live writes. User reports running role-retirement SQL and confirmed their signed-in 19-hour personal plan persists after refresh; retirement grants and two-account isolation are not independently verified. Decisions/chat-history persistence and password reset remain unverified.
+- No real dataset was supplied. Asked asynchronously whether to find public data or use their CSV/Excel. Meanwhile prepared a separate initial Dubai DHA 2024 aggregate resource analysis under analysis/dubai-2024, with provenance, 22 transcribed category counts, reproducible Node checks and report/CSV/JSON. All three totals and physician subset reconcile. Do not substitute annual licensed counts into fictional clinic waits/free-hour forecasts or claim operational/user validation. Source choice can be steered by user reply.
 - HalaCapacity AI is a prototype for one intended user: a capacity planner comparing specialist availability and waiting pressure across clinics.
 - User requested reverting Admin/Planner/Reviewer roles. Current local branch is feature/single-planner, based on feature/team-roles at 981fbb2. Prior content/design improvements from d638ffe stay.
 - Remove Team navigation, role controls, workspace selection, shared submissions and team chat context. Retain Supabase sign-in, private account plans/decisions/history, browser demo and existing popup assistant.
@@ -25,7 +27,7 @@
 - Personal migration 202611090001_planning_workspace.sql is applied: planning_plans, planning_decisions, planning_chat_audit. RLS enabled, expected policy counts 3/2/2 and anonymous reads denied. User signed in and showed Clinic Alpha/Psychiatry at 18 specialist hours. Full live cross-account isolation testing remains outstanding.
 - Historical team migration 202611100001_team_roles.sql was also applied by the user, who showed Admin in HalaCapacity Team. Preserve that migration and historical rows; do not rerun it to reactivate roles.
 - New 202611100002_retire_team_roles.sql revokes ordinary-client grants on seven team tables, three team RPCs and private helpers. No rows are deleted; Auth/personal grants remain. Repeatable and safe on personal-only installations.
-- IMPORTANT: retirement SQL is prepared and locally tested but NOT YET APPLIED TO THE HOSTED PROJECT. Removing UI alone does not revoke old backend access. User must run it in Supabase SQL Editor, then verify personal saving.
+- Retirement SQL was prepared and locally tested; user subsequently reports running it. The agent cannot independently verify authenticated hosted grants without privileged access. Signed-in personal saving/reload has since been confirmed by the user. Backend follow-up is on hold.
 - ROLE_RETIREMENT.md documents the transition. Ignored .browser-qa/role-retirement.html at http://localhost:5173/.browser-qa/role-retirement.html offers copyable SQL plus three boolean privilege checks. Old local activation shortcuts were disabled. No live cloud records were created/deleted by this rollback.
 
 ## Collaboration and verification
