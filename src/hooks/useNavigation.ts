@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-export const PAGES = { overview: 'Overview', planner: 'Planner', decisions: 'Decisions', evidence: 'Evidence', history: 'History', team: 'Team', help: 'Help', account: 'Account' } as const;
+export const PAGES = { overview: 'Overview', planner: 'Planner', decisions: 'Decisions', evidence: 'Evidence', history: 'History', help: 'Help', account: 'Account' } as const;
 export type Page = keyof typeof PAGES;
 function readRoute() {
   const [name, query] = window.location.hash.slice(1).split('?');

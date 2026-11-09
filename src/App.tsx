@@ -17,11 +17,6 @@ import PolicyEvidencePanel from '@/components/PolicyEvidencePanel';
 import Overview from '@/components/Overview';
 import ScenarioPlanner from '@/components/ScenarioPlanner';
 import AccountPanel from '@/components/AccountPanel';
-import TeamPage from '@/components/TeamPage';
-import TeamSubmissionBar from '@/components/TeamSubmissionBar';
-import { useTeamDirectory, useTeamWorkspace } from '@/teams/useTeams';
-import { canEditTeam, canReviewTeam, teamProposalId } from '@/teams/types';
-import { emptyWorkspace } from '@/lib/workspaceRepository';
 import HelpPage from '@/components/HelpPage';
 import ChatWidget from '@/components/ChatWidget';
 import { SCENARIO_STAGES, STAGE_ORDER } from '@/data/scenario';
@@ -36,7 +31,6 @@ const NAV = [
   { page: 'overview', icon: LayoutDashboard }, { page: 'planner', icon: SlidersHorizontal },
   { page: 'decisions', icon: ClipboardCheck }, { page: 'evidence', icon: Library },
   { page: 'history', icon: History }, { page: 'help', icon: CircleHelp },
-  { page: 'team', icon: UserRound },
 ] as const;
 
 function App() {
@@ -51,43 +45,28 @@ function App() {
   const { page, source, navigate } = useNavigation();
   const auth = useAuth();
   const account = useAccountWorkspace(auth.session?.user.id);
-  const directory = useTeamDirectory(auth.session?.user.id);
-  const [workspaceChoice, setWorkspaceChoice] = useState<{ owner: string; teamId: string | null } | null>(null);
-  const desiredTeam = workspaceChoice?.owner === auth.session?.user.id ? workspaceChoice?.teamId : directory.teams[0]?.id;
-  const activeTeam = directory.teams.find(item => item.id === desiredTeam);
-  const teamAccount = useTeamWorkspace(auth.session?.user.id, activeTeam?.id);
-  const [submissionChoice, setSubmissionChoice] = useState<{ teamId: string; stage: StageId; id: string } | null>(null);
-  const teamRole = teamAccount.data?.role ?? activeTeam?.role;
   const signedIn = Boolean(auth.session);
-  const workspaceError = directory.error ?? (activeTeam ? teamAccount.error : account.error);
-  const workspaceLoading = directory.loading || (activeTeam ? teamAccount.loading : account.loading);
-  const workspaceBlocked = auth.loading || (signedIn && (workspaceLoading || Boolean(workspaceError)));
-  const workspaceData = activeTeam ? teamAccount.data ?? emptyWorkspace() : account.data;
-  const statuses = signedIn ? workspaceData.statuses : demoStatuses;
-  const audit = signedIn ? workspaceData.audit : demoAudit;
-  const chatAudit = signedIn ? workspaceData.chatAudit : demoChatAudit;
-  const savedAdjustments = signedIn ? workspaceData.adjustments : demoAdjustments;
+  const workspaceBlocked = auth.loading || (signedIn && (account.loading || Boolean(account.error)));
+  const statuses = signedIn ? account.data.statuses : demoStatuses;
+  const audit = signedIn ? account.data.audit : demoAudit;
+  const chatAudit = signedIn ? account.data.chatAudit : demoChatAudit;
+  const savedAdjustments = signedIn ? account.data.adjustments : demoAdjustments;
   const rawAdjustments = savedAdjustments?.[stageId] ?? EMPTY_ADJUSTMENTS;
-  const draftAdjustments = useMemo(() => {
+  const adjustments = useMemo(() => {
     try { return validateAdjustments(stageId, rawAdjustments); } catch { return EMPTY_ADJUSTMENTS; }
   }, [stageId, rawAdjustments]);
-  const submissions = teamAccount.data?.submissions ?? [];
-  const reviewingSubmission = submissions.find(item => item.stage === stageId && item.id === (submissionChoice?.teamId === activeTeam?.id && submissionChoice?.stage === stageId ? submissionChoice.id : null)) ?? submissions.find(item => item.stage === stageId);
-  const matchingSubmission = submissions.find(item => item.stage === stageId && planRevision(item.adjustments) === planRevision(draftAdjustments));
-  const contextSubmission = page === 'decisions' ? reviewingSubmission : matchingSubmission;
-  const adjustments = activeTeam && page === 'decisions' && reviewingSubmission ? reviewingSubmission.adjustments : draftAdjustments;
   const revision = planRevision(adjustments);
   const stage = useMemo(() => applyAdjustments(stageId, adjustments), [stageId, adjustments]);
   const report = useMemo(() => {
     const result = coordinateStage(stage, runAllAgents(stage));
     return { ...result, proposals: result.proposals.map(proposal => ({ ...proposal,
-      id: activeTeam ? teamProposalId(contextSubmission?.id ?? `draft:${stageId}:${revision}`, proposal.agent) : revision === 'original' ? proposal.id : `${stageId}:${revision}:${proposal.agent}` })) };
-  }, [stage, stageId, revision, activeTeam, contextSubmission?.id]);
+      id: revision === 'original' ? proposal.id : `${stageId}:${revision}:${proposal.agent}` })) };
+  }, [stage, stageId, revision]);
   const selected = report.proposals.find(proposal => proposal.id === selectedId) ?? null;
   const selectedStatus = selected ? statuses[selected.id] ?? 'pending' : 'pending';
 
   useEffect(() => { if (auth.recovery) navigate('account'); }, [auth.recovery, navigate]);
-  useEffect(() => { setSelectedId(null); setNotice(null); }, [auth.session?.user.id, stageId, activeTeam?.id]);
+  useEffect(() => { setSelectedId(null); setNotice(null); }, [auth.session?.user.id, stageId]);
   useEffect(() => {
     if (!source) document.getElementById('main-content')?.focus({ preventScroll: true });
   }, [page, source]);
@@ -96,31 +75,25 @@ function App() {
   async function applyPlan(values: ScenarioAdjustments) {
     const valid = validateAdjustments(stageId, values);
     if (workspaceBlocked) throw new Error('Wait for your workspace to finish loading.');
-    if (activeTeam) await teamAccount.savePlan(stageId, valid);
-    else if (signedIn) await account.savePlan(stageId, valid);
+    if (signedIn) await account.savePlan(stageId, valid);
     else setAdjustments(current => ({ ...current, [stageId]: valid }));
-    setSelectedId(null); setNotice(activeTeam ? 'Team scenario saved. Submit the applied values when ready for review.' : signedIn ? 'Scenario saved to your account. Findings recalculated.' : 'Scenario applied to the browser demo. Findings recalculated.');
+    setSelectedId(null); setNotice(signedIn ? 'Scenario saved to your account. Findings recalculated.' : 'Scenario applied to the browser demo. Findings recalculated.');
   }
   async function recordDecision(decision: Decision, reason: string) {
     if (!selected || workspaceBlocked) throw new Error('Select a recommendation in a loaded workspace.');
-    if (activeTeam && (!canReviewTeam(teamRole) || !reviewingSubmission)) throw new Error('A Reviewer or Admin must select a submitted version before deciding.');
     const entry: AuditEntry = { id: crypto.randomUUID(), time: new Date().toISOString(), stage: stageId, agent: selected.agent,
       summary: selected.summary, evidence: `${selected.evidence.join('; ')} | Policy sources: ${passagesForAgent(selected.agent).map(({ source }) => source.id).join(', ') || 'none'}`,
-      decision, reason, proposalId: selected.id, planRevision: revision, ...(activeTeam ? { submissionId: reviewingSubmission?.id, actorId: auth.session?.user.id } : {}) };
-    if (activeTeam && reviewingSubmission) await teamAccount.decide(reviewingSubmission.id, entry);
-    else if (signedIn) await account.saveDecision(entry);
+      decision, reason, proposalId: selected.id, planRevision: revision };
+    if (signedIn) await account.saveDecision(entry);
     else { setStatuses(current => ({ ...current, [selected.id]: decision })); setAudit(current => [entry, ...current]); }
     setNotice('Decision recorded for this scenario version. No schedules were changed.');
   }
   async function recordChat(entry: ChatAudit) {
-    if (activeTeam) await teamAccount.saveChat(entry);
-    else if (signedIn) await account.saveChat(entry);
+    if (signedIn) await account.saveChat(entry);
     else setChatAudit(current => [entry, ...current]);
   }
   function exportBriefing() {
     const body = { label: 'FICTIONAL planning data', stage, adjustments, revision, report,
-      workspace: activeTeam ? { kind: 'team', id: activeTeam.id, name: activeTeam.name, role: teamRole } : { kind: signedIn ? 'personal' : 'demo' },
-      ...(activeTeam && contextSubmission ? { submission: contextSubmission } : {}),
       statuses: Object.fromEntries(report.proposals.map(proposal => [proposal.id, statuses[proposal.id] ?? 'pending'])),
       audit: audit.filter(entry => entry.stage === stageId), chatAudit: chatAudit.filter(entry => entry.stage === stageId) };
     const url = URL.createObjectURL(new Blob([JSON.stringify(body, null, 2)], { type: 'application/json' }));
@@ -133,39 +106,34 @@ function App() {
     <DataBanner />
     <div className="briefing-layout">
       <aside className="scenario-rail" aria-label="Workspace navigation">
-        <a className="rail-brand" href="#overview">HalaCapacity <span>AI</span></a><p className="eyebrow">Your planning workspace</p>
-        <nav className="workspace-nav" aria-label="Main navigation">{NAV.filter(item => item.page !== 'team' || signedIn).map(({ page: target, icon: Icon }) => <a key={target} href={`#${target}`} aria-current={page === target ? 'page' : undefined}><Icon size={17} aria-hidden="true" /><span>{PAGES[target]}</span></a>)}</nav>
-        {signedIn && <label className="workspace-picker">Workspace<select aria-label="Workspace" value={activeTeam?.id ?? ''} disabled={directory.loading} onChange={event => { setWorkspaceChoice({ owner: auth.session!.user.id, teamId: event.target.value || null }); setSelectedId(null); }}><option value="">Personal workspace</option>{directory.teams.map(item => <option key={item.id} value={item.id}>{item.name} · {item.role}</option>)}</select></label>}
+        <a className="rail-brand" href="#overview">HalaCapacity <span>AI</span></a><p className="eyebrow">Capacity planner workspace</p>
+        <nav className="workspace-nav" aria-label="Main navigation">{NAV.map(({ page: target, icon: Icon }) => <a key={target} href={`#${target}`} aria-current={page === target ? 'page' : undefined}><Icon size={17} aria-hidden="true" /><span>{PAGES[target]}</span></a>)}</nav>
         <div className="rail-stages"><p className="eyebrow">Active scenario</p><StageSelector value={stageId} onChange={next => { setStageId(next); setSelectedId(null); setNotice(null); }} /></div>
         <div className="rail-note"><p>6 fictional clinics · 4 specialties</p><a href="#account"><UserRound size={15} aria-hidden="true" />{signedIn ? 'Your account' : 'Sign in / Create account'}</a></div>
       </aside>
       <div className="briefing-document">
         <header className="workspace-header"><div><p className="eyebrow">Workspace / {PAGES[page]}</p><h1>{PAGES[page]}</h1></div><div className="workspace-header-actions">
-          <span className="connection-label">{auth.loading ? 'Checking account…' : signedIn ? workspaceError ? 'Workspace unavailable' : workspaceLoading ? 'Loading workspace…' : activeTeam ? `${teamRole} · ${activeTeam.name}` : 'Personal account workspace' : 'Demo · browser only'}</span>
+          <span className="connection-label">{auth.loading ? 'Checking account…' : signedIn ? account.error ? 'Account unavailable' : account.loading ? 'Loading saved workspace…' : 'Account workspace' : 'Demo · browser only'}</span>
           <button type="button" className="secondary-button export-button" onClick={exportBriefing} disabled={workspaceBlocked}><Download size={15} aria-hidden="true" />Export</button>
           <button type="button" className="account-button" onClick={() => go('account')}><UserRound size={17} aria-hidden="true" />{signedIn ? 'Account' : 'Sign in'}</button>
         </div></header>
         <div className="scenario-context"><span>{SCENARIO_STAGES[stageId].label.replace(/^Stage \d /, '')}</span><p>{Object.keys(adjustments).length ? 'What-if changes applied' : 'Original scenario'}</p><a href="#planner">Change inputs →</a></div>
         <main id="main-content" tabIndex={-1} className="workspace-main">
           {auth.error && <p className="form-error" role="alert">{auth.error}</p>}
-          {page === 'team' && workspaceError && <p className="form-error" role="alert">{workspaceError}</p>}
           {!signedIn && (statusStorageError || auditStorageError || chatStorageError || planStorageError) && <p className="form-error" role="alert">Browser storage is unavailable. Current changes are only in memory; export them before leaving.</p>}
           {notice && <p className="workspace-notice" role="status">{notice}</p>}
-          {workspaceBlocked && !['account', 'help', 'team'].includes(page) ? <div className="workspace-loading" role="status">{workspaceError ? <><h2>We couldn’t load your saved workspace</h2><p>{workspaceError}</p><button className="primary-button" onClick={() => { void directory.reload(); void (activeTeam ? teamAccount.reload() : account.reload()); }}>Retry connection</button></> : <p>Loading your workspace…</p>}</div> : <>
+          {workspaceBlocked && !['account', 'help'].includes(page) ? <div className="workspace-loading" role="status">{account.error ? <><h2>We couldn’t load your saved workspace</h2><p>{account.error}</p><button className="primary-button" onClick={() => void account.reload()}>Retry connection</button></> : <p>Loading your workspace…</p>}</div> : <>
           {page === 'overview' && <Overview stage={stage} report={report} statuses={statuses} changedCount={Object.keys(adjustments).length} onPlan={() => go('planner')} onReview={review} />}
-          {page === 'planner' && <>{activeTeam && !canEditTeam(teamRole) && <p className="workspace-notice">Reviewer access: inspect the figures here; only a Planner or Admin can edit or submit them.</p>}<ScenarioPlanner key={`${auth.session?.user.id ?? 'demo'}:${activeTeam?.id ?? 'personal'}:${stageId}`} stage={stage} adjustments={adjustments} disabled={workspaceBlocked || Boolean(activeTeam && !canEditTeam(teamRole))} onApply={applyPlan} onFindings={() => review()} />
-            {activeTeam && <TeamSubmissionBar stage={stageId} submissions={submissions} reviewing={false} canSubmit={canEditTeam(teamRole)} hasAppliedPlan={Object.prototype.hasOwnProperty.call(teamAccount.data?.adjustments ?? {}, stageId)} onSelect={() => {}} onSubmit={async () => { const id = await teamAccount.submit(stageId); setSubmissionChoice({ teamId: activeTeam.id, stage: stageId, id }); go('decisions'); setSelectedId(null); setNotice('Scenario submitted for team review.'); }} />}</>}
+          {page === 'planner' && <ScenarioPlanner key={`${auth.session?.user.id ?? 'demo'}:${stageId}`} stage={stage} adjustments={adjustments} disabled={workspaceBlocked} onApply={applyPlan} onFindings={() => review()} />}
           {page === 'decisions' && <div className="decisions-page"><div className="page-heading"><h2>Review recommendations</h2></div>
-            {activeTeam && <><TeamSubmissionBar stage={stageId} submissions={submissions} selectedId={reviewingSubmission?.id} reviewing canSubmit={false} hasAppliedPlan={false} onSelect={id => { setSubmissionChoice({ teamId: activeTeam.id, stage: stageId, id }); setSelectedId(null); }} onSubmit={async () => {}} /><p className="field-note mb-5">{canReviewTeam(teamRole) ? 'Record your decision against the selected submitted snapshot.' : 'Planner access: inspect submissions here. A Reviewer or Admin records team decisions.'}</p></>}
             <div className="decision-workspace">
             <CoordinatorPanel report={report} statuses={statuses} selectedId={selectedId} onSelect={proposal => { setSelectedId(proposal.id); setNotice(null); if (window.matchMedia('(max-width: 1099px)').matches) requestAnimationFrame(() => document.getElementById('decision-detail')?.scrollIntoView({ block: 'start' })); }} />
-            <div id="decision-detail"><ApprovalControls key={selected?.id ?? 'none'} proposal={selected} status={selectedStatus} onDecide={recordDecision} disabled={workspaceBlocked || Boolean(activeTeam && (!canReviewTeam(teamRole) || !reviewingSubmission))} /></div>
+            <div id="decision-detail"><ApprovalControls key={selected?.id ?? 'none'} proposal={selected} status={selectedStatus} onDecide={recordDecision} disabled={workspaceBlocked} /></div>
             </div>
             <details className="progressive-details"><summary>How the four agents reached their findings</summary><div className="pt-5"><AgentCards proposals={report.proposals} statuses={statuses} /></div></details>
           </div>}
           {page === 'evidence' && <PolicyEvidencePanel focusSourceId={source} />}
-          {page === 'history' && <HistoryPage entries={audit} chatEntries={chatAudit} connected={signedIn} onRefresh={() => void (activeTeam ? teamAccount.reload() : account.reload())} />}
-          {page === 'team' && (auth.session ? <TeamPage userId={auth.session.user.id} available={directory.available} team={activeTeam} role={teamRole} members={teamAccount.data?.members ?? []} onRefresh={async () => { await directory.reload(); await teamAccount.reload(); }} onMember={async (id, role) => { await teamAccount.setMember(id, role); await directory.reload(); }} /> : <div className="setup-notice"><h2>Sign in to join a team</h2><button className="primary-button" onClick={() => go('account')}>Open Account</button></div>)}
+          {page === 'history' && <HistoryPage entries={audit} chatEntries={chatAudit} connected={signedIn} onRefresh={() => void account.reload()} />}
           {page === 'help' && <HelpPage />}
           {page === 'account' && <AccountPanel session={auth.session} recovery={auth.recovery} onRecovered={auth.finishRecovery} onContinue={() => go('overview')} />}
           </>}
@@ -173,7 +141,7 @@ function App() {
         <footer className="briefing-footer"><span>HalaCapacity AI · Fictional planning demonstration</span><a href="#help">Help & limitations</a><a href="#account">Account</a></footer>
       </div>
     </div>
-    <ChatWidget key={`${auth.session?.user.id ?? 'demo'}:${activeTeam?.id ?? 'personal'}`} stageId={stageId} adjustments={adjustments} currentView={page} audit={audit} teamId={activeTeam?.id} submissionId={contextSubmission?.id} teamRole={teamRole} accessToken={auth.session?.access_token} onAudit={recordChat} onSource={id => { navigate('evidence', id); requestAnimationFrame(() => window.dispatchEvent(new CustomEvent('halacapacity:source', { detail: id }))); }} />
+    <ChatWidget key={auth.session?.user.id ?? 'demo'} stageId={stageId} adjustments={adjustments} currentView={page} audit={audit} accessToken={auth.session?.access_token} onAudit={recordChat} onSource={id => { navigate('evidence', id); requestAnimationFrame(() => window.dispatchEvent(new CustomEvent('halacapacity:source', { detail: id }))); }} />
   </div>;
 }
 

@@ -24,7 +24,7 @@ For a connected account, the function verifies the access token with Supabase Au
 
 The context includes applied records, totals, forecasts, agent evidence/recommendations, coordinator conflicts/gaps, recent decision metadata, retrieved passage IDs/text and current navigation view. History helps interpret follow-ups; it is not a new source of facts.
 
-For shared teams, context also includes the role verified from database membership and the selected submitted version. The server rejects nonmembers and reads snapshots within the verified team. Browser role claims are replaced. The system prompt explains Planner/Reviewer/Admin permissions and the distinction between a mutable draft and an immutable submission. The assistant remains read-only; team chat audit notes are author-private. See TEAM_SETUP.md.
+The application now uses a single capacity-planner workflow. Team role/context fields have been removed, and legacy team/submission requests are rejected with a clear retired-workspace response. Authenticated chat reads only the caller's private account context. No other prompt or popup redesign is part of this rollback; further chatbot changes are deferred.
 
 ## Live provider configuration
 
@@ -46,4 +46,4 @@ Chat questions, used source IDs and visible answer summaries are logged to the c
 
 ## Verification
 
-Thirty automated checks cover chat/planning boundaries, membership-scoped model context and team policies executed in an embedded PostgreSQL engine. Isolated Chrome checks cover ordinary chat behavior and mocked team-role workflows. Real model calls, hosted function behavior and hosted team policies remain unverified until configuration/migration. Existing personal sign-in was demonstrated by the user; complete cross-account testing remains outstanding.
+Twenty-three automated checks cover chat/planning boundaries and non-destructive role retirement executed in an embedded PostgreSQL engine. Legacy team chat calls are blocked before data/model requests. Real model calls, hosted function behavior and hosted retirement remain unverified until configuration/migration. Existing personal sign-in was demonstrated by the user; complete cross-account testing remains outstanding.

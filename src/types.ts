@@ -93,6 +93,4 @@ export interface AuditEntry {
   reason: string;
   proposalId?: string;
   planRevision?: string;
-  submissionId?: string;
-  actorId?: string;
 }

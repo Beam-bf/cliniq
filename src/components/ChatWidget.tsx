@@ -5,10 +5,8 @@ import { SCENARIO_STAGES } from '@/data/scenario';
 import type { ChatAudit } from '@/chat/core';
 import type { AuditEntry, StageId } from '@/types';
 import type { ScenarioAdjustments } from '@/planning/scenarioPlanning';
-import type { TeamRole } from '@/teams/types';
 
 interface Props { stageId: StageId; audit: AuditEntry[]; adjustments: ScenarioAdjustments; currentView: string;
-  teamId?: string; submissionId?: string; teamRole?: TeamRole;
   accessToken?: string; onAudit: (entry: ChatAudit) => void | Promise<void>; onSource: (id: string) => void }
 export default function ChatWidget(props: Props) {
   const [open, setOpen] = useState(false);

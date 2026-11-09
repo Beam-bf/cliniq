@@ -1,6 +1,6 @@
 # Activate the account backend
 
-The local implementation uses the existing Supabase dependency. On 10 November 2026, the supplied project URL and public publishable key were configured in ignored `.env.local` and `.dev.vars` files. The project responds and reports email sign-in, sign-up and email confirmation enabled. The user applied the migration: all three tables now deny anonymous queries, and the supplied SQL result confirms row-level security enabled with 3 plan policies, 2 decision policies and 2 chat policies. Real sign-in, saving and cross-account isolation still need verification. No accounts or emails were created by the assistant's checks.
+The local implementation uses the existing Supabase dependency. On 10 November 2026, the supplied project URL and public publishable key were configured in ignored `.env.local` and `.dev.vars` files. The project responds and reports email sign-in, sign-up and email confirmation enabled. The user applied the migration: all three tables now deny anonymous queries, and the supplied SQL result confirms row-level security enabled with 3 plan policies, 2 decision policies and 2 chat policies. The user subsequently signed in and showed Clinic Alpha/Psychiatry with 18 applied specialist hours. Hosted saving after role retirement and cross-account isolation still need verification. No accounts or emails were created by the assistant's checks.
 
 ## 1. Create or select the project
 
@@ -20,13 +20,13 @@ Tables:
 
 All tables enable row-level security. Anonymous access is revoked. Authenticated read/insert policies require `auth.uid() = user_id`. Plan updates enforce the same owner check; decision/chat update/delete access is not granted. No service-role key is needed by this app. Supabase's [row-level security guide](https://supabase.com/docs/guides/database/postgres/row-level-security) explains how database policies enforce this boundary.
 
-The original SQL configures personal workspaces. Shared teams and Admin/Planner/Reviewer roles use the separate additive migration and setup in [TEAM_SETUP.md](TEAM_SETUP.md). Do not rerun the original personal migration to enable teams. Team planning bounds are checked inside the database as well as the app.
+The original SQL configures private capacity-planner accounts. The team-role experiment has been removed from the application. Keep previously applied migration history, and use the non-destructive retirement step in [ROLE_RETIREMENT.md](ROLE_RETIREMENT.md) to disable its old APIs. Do not rerun either creation migration or delete existing records to remove roles.
 
 ## 3. Configure authentication
 
 Enable email/password authentication, review your project's password policy, and keep email confirmation enabled for normal sign-up. Configure the site's URL and an explicit redirect allow-list for the origins you actually use, such as your local Vite URL and future hosted URL. The app redirects confirmation/reset links to its root and handles recovery events by showing a new-password form. Production email delivery may require your own SMTP configuration; review your provider's current delivery limits.
 
-The app implements sign-up, sign-in, sign-out, reset email and password update using the documented [password authentication flows](https://supabase.com/docs/guides/auth/passwords). Account email/password go to Supabase Auth, never the chatbot. No OAuth providers or MFA are configured. Team roles are stored in database membership, not editable signup metadata, and need their own migration/first-Admin setup.
+The app implements sign-up, sign-in, sign-out, reset email and password update using the documented [password authentication flows](https://supabase.com/docs/guides/auth/passwords). Account email/password go to Supabase Auth, never the chatbot. No OAuth providers or MFA are configured. All application accounts use the same capacity-planner workflow with private records; there is no application Admin assignment.
 
 ## 4. Configure the client build
 
@@ -46,4 +46,4 @@ Create two test accounts in separate browser profiles. For each account, verify 
 
 Check a database/network failure: a save must display an error and must not be represented as saved. Test the chat endpoint with missing and expired tokens, then with an actual valid session; ensure the context matches the saved account plan. Verify that sign-out clears the account view and returns to the separate browser demo without copying private records. Only then describe the live backend as activated.
 
-The included automated tests use mocks for service boundaries. The migration and actual row-level policies have **not** been executed here.
+Automated tests use mocks for service boundaries and local PostgreSQL to check personal access/isolation and the non-destructive role retirement. The original migrations were applied to the hosted project by the user; the retirement SQL still needs to be run there. Local tests do not replace hosted authenticated checks.

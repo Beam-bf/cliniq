@@ -58,6 +58,6 @@ If you both use coding assistants, give each assistant its own task and branch. 
 
 Never commit `.env` files, privileged API keys, database passwords, `node_modules`, build output, npm caches or browser QA profiles. Existing ignore rules cover these generated/local files. Public Supabase configuration is described in the setup guide; keep real configuration in each computer's local environment and hosting settings. Invite your friend to the development services with their own account rather than sharing passwords.
 
-Demo localStorage is separate on each computer. Personal account plans/history stay private. To share planning work, apply the additive team migration and assign an initial Admin, then add confirmed accounts as Planner/Reviewer/Admin. See [TEAM_SETUP.md](TEAM_SETUP.md). Never change a migration already applied to the shared project.
+Demo localStorage is separate on each computer. Signed-in capacity-planner accounts keep their plans/history private. Application team roles have been removed; see [ROLE_RETIREMENT.md](ROLE_RETIREMENT.md) for retiring previously enabled team APIs without deleting data. Never modify a migration already applied to the shared project.
 
 Keep all operational demo data fictional and aggregate. The capacity agents remain fixed rules, and approvals record a review without changing real schedules.

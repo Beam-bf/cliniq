@@ -4,10 +4,8 @@ import type { ChatAnswer, ChatAudit, ChatRequest, ChatTurn } from '@/chat/core';
 import type { AuditEntry, StageId } from '@/types';
 import type { ScenarioAdjustments } from '@/planning/scenarioPlanning';
 import { supabase } from '@/lib/supabase';
-import type { TeamRole } from '@/teams/types';
 
 interface Props { stageId: StageId; audit: AuditEntry[]; adjustments: ScenarioAdjustments; currentView: string; isOpen: boolean;
-  teamId?: string; submissionId?: string; teamRole?: TeamRole;
   accessToken?: string; onAudit: (entry: ChatAudit) => void | Promise<void>; onSource: (id: string) => void }
 interface Message { question: string; response: ChatAnswer }
 const suggestions: Record<StageId, string[]> = {
@@ -16,7 +14,7 @@ const suggestions: Record<StageId, string[]> = {
   'specialist-leave': ['What does the forecast show during specialist leave?', 'What tele-pooling is proposed?'],
 };
 
-export default function ChatPanel({ stageId, audit, adjustments, currentView, isOpen, accessToken, teamId, submissionId, teamRole, onAudit, onSource }: Props) {
+export default function ChatPanel({ stageId, audit, adjustments, currentView, isOpen, accessToken, onAudit, onSource }: Props) {
   const [question, setQuestion] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [busy, setBusy] = useState(false);
@@ -40,7 +38,7 @@ export default function ChatPanel({ stageId, audit, adjustments, currentView, is
     const history: ChatTurn[] = messages.slice(-2).flatMap(message => [
       { role: 'user', content: message.question.slice(0, 600) }, { role: 'assistant', content: message.response.answer.slice(0, 600) },
     ]);
-    const payload: ChatRequest = { question: text.trim(), scenarioId: stageId, history, adjustments, currentView, teamId, submissionId, teamRole,
+    const payload: ChatRequest = { question: text.trim(), scenarioId: stageId, history, adjustments, currentView,
       recentAudit: audit.slice(0, 5).map(({ stage, agent, decision }) => ({ stage, agent, decision })) };
     try {
       let answer: ChatAnswer;
@@ -48,7 +46,7 @@ export default function ChatPanel({ stageId, audit, adjustments, currentView, is
         if (supabase && !accessToken) throw new TypeError('Demo uses offline answers. Sign in for the connected assistant.');
         const result = await fetch('/api/chat', { method: 'POST',
           headers: { 'Content-Type': 'application/json', ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) }, body: JSON.stringify(payload), signal: AbortSignal.timeout(20000) });
-        if ([400, 401, 403, 413, 415, 429].includes(result.status)) {
+        if ([400, 401, 403, 409, 413, 415, 429].includes(result.status)) {
           const body = await result.json(); throw new Error(body.error ?? 'Request rejected.');
         }
         if (!result.ok || !result.headers.get('Content-Type')?.includes('application/json')) throw new TypeError('Service unavailable');

@@ -52,7 +52,6 @@ export default function AccountPanel({ session, recovery, onRecovered, onContinu
       <button type="button" className="primary-button" onClick={onContinue}>Open demo workspace</button>
     </div> : session && !recovery ? <div className="setup-notice">
       <p className="text-sm">Signed in as <strong>{session.user.email}</strong></p>
-      <p className="text-sm">User UID: <code className="member-uid">{session.user.id}</code></p>
       <p className="text-sm">Your plans and history belong to this account. Demo records are kept separate and are not uploaded automatically.</p>
       <div className="button-row"><button className="primary-button" onClick={onContinue}>Open workspace</button><button className="secondary-button" disabled={busy} onClick={() => void signOut()}>{busy ? 'Signing out…' : 'Sign out'}</button></div>
     </div> : <form onSubmit={event => void submit(event)} className="account-form" aria-busy={busy}>
