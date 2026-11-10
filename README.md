@@ -19,7 +19,7 @@ Record actual responses accurately and obtain permission before quoting someone 
 
 ## Real-data analysis
 
-Backend development is currently on hold. A first descriptive analysis uses Dubai Health Authority's published **2024** workforce and facility tables: [analysis report](analysis/dubai-2024/REPORT.md), [CSV](analysis/dubai-2024/results.csv), and [source/provenance](analysis/dubai-2024/source-data.json). Reproduce it with `node analysis/dubai-2024/analyze.mjs`. All three table totals and the physician subset reconcile. These are regional licensed-resource counts; they do not establish clinic waiting times or spare specialist hours. The website's fictional scenarios remain labelled as such.
+A first descriptive analysis uses Dubai Health Authority's published **2024** workforce and facility tables: [analysis report](analysis/dubai-2024/REPORT.md), [CSV](analysis/dubai-2024/results.csv), and [source/provenance](analysis/dubai-2024/source-data.json). Reproduce it with `node analysis/dubai-2024/analyze.mjs`. All three table totals and the physician subset reconcile. These are regional licensed-resource counts; they do not establish clinic waiting times or spare specialist hours. The website's fictional scenarios remain labelled as such.
 
 ## What you can do
 
@@ -49,6 +49,7 @@ npm run lint
 npm run typecheck
 npm test
 npm run build
+npm run backend:check
 npm run preview
 ```
 
@@ -60,7 +61,7 @@ The shared repository is https://github.com/Beam-bf/halacapacity-ai. See [CONTRI
 
 ## Backend and account activation
 
-Supabase is now an active integration, using the dependency already in the project. The app contains auth flows, an account-scoped repository, database migration with row-level security, and server-side session verification for account chat context. **The public project connection is configured locally**, and authentication settings respond successfully. The user created the three planning tables; row-level security is enabled and anonymous reads are denied. The user signed in and showed an applied 18-hour scenario. Hosted saving after role retirement and cross-account isolation still need verification. See [BACKEND_SETUP.md](BACKEND_SETUP.md) for activation steps.
+Supabase is connected locally. The app contains auth flows, private account storage, row-level-security migrations, and server-side session verification for account chat context. The user reports applying the role-retirement SQL and confirms a signed-in 19-hour plan survives refresh. Read-only public checks on 10 November 2026 confirm email authentication/confirmation enabled and anonymous reads denied on all three personal tables. Account now shows saved-record counts, sync time, save progress and connection retry. Local PostgreSQL tests verify private plans, decisions and chat history; hosted decision/chat persistence, password recovery and two-account isolation still require signed-in verification. See [BACKEND_SETUP.md](BACKEND_SETUP.md).
 
 Public browser build configuration:
 
@@ -88,7 +89,7 @@ The browser demo remains available without an account. Configured but signed-out
 
 ## Persistence and review versions
 
-The application targets one capacity planner workflow. Team roles and shared submissions have been removed from the UI, repositories and chat integration. Historical team records are retained in the database; [ROLE_RETIREMENT.md](ROLE_RETIREMENT.md) explains the non-destructive SQL step that disables the old team APIs. That SQL still needs to be applied to the hosted project. Personal planning tables and Auth are unchanged.
+The application targets one capacity planner workflow. Team roles and shared submissions have been removed from the UI, repositories and chat integration. Historical team records are retained in the database; [ROLE_RETIREMENT.md](ROLE_RETIREMENT.md) explains the non-destructive SQL step that disables the old team APIs. The user reports applying it; hosted grants have not been independently verified. [supabase/verify_backend.sql](supabase/verify_backend.sql) provides read-only setup checks. Personal planning tables and Auth are unchanged.
 
 Demo plans/statuses/history use `localStorage` keys prefixed `halacapacity.`. Signed-in workspaces use three account-specific tables: `planning_plans`, `planning_decisions`, and `planning_chat_audit`. Demo records are not imported into an account automatically, and account data is not copied back to demo storage when signing out. A failed account save surfaces an error instead of silently saving to demo storage.
 

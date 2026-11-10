@@ -1,6 +1,14 @@
 # Activate the account backend
 
-The local implementation uses the existing Supabase dependency. On 10 November 2026, the supplied project URL and public publishable key were configured in ignored `.env.local` and `.dev.vars` files. The project responds and reports email sign-in, sign-up and email confirmation enabled. The user applied the migration: all three tables now deny anonymous queries, and the supplied SQL result confirms row-level security enabled with 3 plan policies, 2 decision policies and 2 chat policies. The user subsequently signed in and showed Clinic Alpha/Psychiatry with 18 applied specialist hours. Hosted saving after role retirement and cross-account isolation still need verification. No accounts or emails were created by the assistant's checks.
+The local implementation uses the existing Supabase dependency. The supplied public configuration is in ignored `.env.local` and `.dev.vars` files. Read-only hosted checks on 10 November 2026 confirm email authentication and confirmation enabled, and anonymous reads denied on all three personal tables. The user's earlier SQL result confirms row-level security enabled with 3 plan policies, 2 decision policies and 2 chat policies. The user reports applying role retirement and confirms a signed-in 19-hour plan survives refresh. Hosted decision/chat persistence, password recovery and two-account isolation remain unverified. No accounts or emails were created by the assistant's checks.
+
+## Local completion checks
+
+Run `npm run backend:check` to repeat the public read-only checks. It reads `.env.local` or environment variables, prints no credentials, and creates no records. Missing configuration, network failures and unexpected permissions fail the command.
+
+Run [verify_backend.sql](supabase/verify_backend.sql) in the Supabase SQL Editor for read-only checks of table RLS, personal grants and retired team permissions. All five results should be true. These checks do not establish the correctness of every policy or replace the signed-in tests below.
+
+In Account, **Saved workspace** shows loaded scenario/decision/chat counts, last sync time, save progress and a refresh/retry button. A failed save keeps the previous applied plan and displays an error. Refresh and saves cannot overlap, and the assistant waits until account data is available. The browser demo remains separate.
 
 ## 1. Create or select the project
 
@@ -46,4 +54,4 @@ Create two test accounts in separate browser profiles. For each account, verify 
 
 Check a database/network failure: a save must display an error and must not be represented as saved. Test the chat endpoint with missing and expired tokens, then with an actual valid session; ensure the context matches the saved account plan. Verify that sign-out clears the account view and returns to the separate browser demo without copying private records. Only then describe the live backend as activated.
 
-Automated tests use mocks for service boundaries and local PostgreSQL to check personal access/isolation and the non-destructive role retirement. The original migrations were applied to the hosted project by the user; the retirement SQL still needs to be run there. Local tests do not replace hosted authenticated checks.
+Automated tests use mocks for service boundaries and local PostgreSQL to check owner-only plan/decision/chat access, rejected forged-owner writes, append-only history, anonymous denial, permission-check drift detection and non-destructive role retirement. The user reports applying both the original migrations and retirement SQL to the hosted project. Local tests do not replace hosted authenticated checks. Hosting and a live AI provider remain outside this local finalization pass.

@@ -35,7 +35,7 @@ export function createWorkspaceRepository(client: SupabaseClient) {
     async savePlan(userId: string, stage: StageId, adjustments: ScenarioAdjustments) {
       const { error } = await client.from('planning_plans').upsert({ user_id: userId, stage,
         adjustments: validateAdjustments(stage, adjustments), updated_at: new Date().toISOString() }, { onConflict: 'user_id,stage' });
-      if (error) throw new Error('The scenario was not saved. Your previous saved version is still active. Please retry.');
+      if (error) throw new Error('The scenario save could not be confirmed. Your displayed plan has not changed. Refresh your workspace before retrying.');
     },
     async saveDecision(userId: string, entry: AuditEntry) {
       const { error } = await client.from('planning_decisions').insert({ id: entry.id, user_id: userId, stage: entry.stage,

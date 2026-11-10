@@ -113,7 +113,7 @@ function App() {
       </aside>
       <div className="briefing-document">
         <header className="workspace-header"><div><p className="eyebrow">Workspace / {PAGES[page]}</p><h1>{PAGES[page]}</h1></div><div className="workspace-header-actions">
-          <span className="connection-label">{auth.loading ? 'Checking account…' : signedIn ? account.error ? 'Account unavailable' : account.loading ? 'Loading saved workspace…' : 'Account workspace' : 'Demo · browser only'}</span>
+          <span className="connection-label" role="status">{auth.loading ? 'Checking account…' : signedIn ? account.error ? 'Account unavailable' : account.loading ? 'Loading saved workspace…' : account.saving ? 'Saving to account…' : 'Account workspace' : 'Demo · browser only'}</span>
           <button type="button" className="secondary-button export-button" onClick={exportBriefing} disabled={workspaceBlocked}><Download size={15} aria-hidden="true" />Export</button>
           <button type="button" className="account-button" onClick={() => go('account')}><UserRound size={17} aria-hidden="true" />{signedIn ? 'Account' : 'Sign in'}</button>
         </div></header>
@@ -124,24 +124,26 @@ function App() {
           {notice && <p className="workspace-notice" role="status">{notice}</p>}
           {workspaceBlocked && !['account', 'help'].includes(page) ? <div className="workspace-loading" role="status">{account.error ? <><h2>We couldn’t load your saved workspace</h2><p>{account.error}</p><button className="primary-button" onClick={() => void account.reload()}>Retry connection</button></> : <p>Loading your workspace…</p>}</div> : <>
           {page === 'overview' && <Overview stage={stage} report={report} statuses={statuses} changedCount={Object.keys(adjustments).length} onPlan={() => go('planner')} onReview={review} />}
-          {page === 'planner' && <ScenarioPlanner key={`${auth.session?.user.id ?? 'demo'}:${stageId}`} stage={stage} adjustments={adjustments} disabled={workspaceBlocked} onApply={applyPlan} onFindings={() => review()} />}
+          {page === 'planner' && <ScenarioPlanner key={`${auth.session?.user.id ?? 'demo'}:${stageId}`} stage={stage} adjustments={adjustments} disabled={workspaceBlocked || account.saving} onApply={applyPlan} onFindings={() => review()} />}
           {page === 'decisions' && <div className="decisions-page"><div className="page-heading"><h2>Review recommendations</h2></div>
             <div className="decision-workspace">
             <CoordinatorPanel report={report} statuses={statuses} selectedId={selectedId} onSelect={proposal => { setSelectedId(proposal.id); setNotice(null); if (window.matchMedia('(max-width: 1099px)').matches) requestAnimationFrame(() => document.getElementById('decision-detail')?.scrollIntoView({ block: 'start' })); }} />
-            <div id="decision-detail"><ApprovalControls key={selected?.id ?? 'none'} proposal={selected} status={selectedStatus} onDecide={recordDecision} disabled={workspaceBlocked} /></div>
+            <div id="decision-detail"><ApprovalControls key={selected?.id ?? 'none'} proposal={selected} status={selectedStatus} onDecide={recordDecision} disabled={workspaceBlocked || account.saving} /></div>
             </div>
             <details className="progressive-details"><summary>How the four agents reached their findings</summary><div className="pt-5"><AgentCards proposals={report.proposals} statuses={statuses} /></div></details>
           </div>}
           {page === 'evidence' && <PolicyEvidencePanel focusSourceId={source} />}
           {page === 'history' && <HistoryPage entries={audit} chatEntries={chatAudit} connected={signedIn} onRefresh={() => void account.reload()} />}
           {page === 'help' && <HelpPage />}
-          {page === 'account' && <AccountPanel session={auth.session} recovery={auth.recovery} onRecovered={auth.finishRecovery} onContinue={() => go('overview')} />}
+          {page === 'account' && <AccountPanel key={auth.session?.user.id ?? 'demo'} session={auth.session} recovery={auth.recovery} onRecovered={auth.finishRecovery} onContinue={() => go('overview')}
+            workspace={{ loading: account.loading, saving: account.saving, error: account.error, syncedAt: account.syncedAt,
+              plans: Object.keys(account.data.adjustments).length, decisions: audit.length, chats: chatAudit.length, reload: account.reload }} />}
           </>}
         </main>
         <footer className="briefing-footer"><span>HalaCapacity AI · Fictional planning demonstration</span><a href="#help">Help & limitations</a><a href="#account">Account</a></footer>
       </div>
     </div>
-    <ChatWidget key={auth.session?.user.id ?? 'demo'} stageId={stageId} adjustments={adjustments} currentView={page} audit={audit} accessToken={auth.session?.access_token} onAudit={recordChat} onSource={id => { navigate('evidence', id); requestAnimationFrame(() => window.dispatchEvent(new CustomEvent('halacapacity:source', { detail: id }))); }} />
+    <ChatWidget key={auth.session?.user.id ?? 'demo'} disabled={workspaceBlocked || account.saving} stageId={stageId} adjustments={adjustments} currentView={page} audit={audit} accessToken={auth.session?.access_token} onAudit={recordChat} onSource={id => { navigate('evidence', id); requestAnimationFrame(() => window.dispatchEvent(new CustomEvent('halacapacity:source', { detail: id }))); }} />
   </div>;
 }
 

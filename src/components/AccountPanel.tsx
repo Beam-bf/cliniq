@@ -2,8 +2,9 @@ import { useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { accountConfigurationError, supabase } from '@/lib/supabase';
 
-interface Props { session: Session | null; recovery: boolean; onRecovered: () => void; onContinue: () => void }
-export default function AccountPanel({ session, recovery, onRecovered, onContinue }: Props) {
+interface Props { session: Session | null; recovery: boolean; onRecovered: () => void; onContinue: () => void;
+  workspace: { loading: boolean; saving: boolean; error: string | null; syncedAt: string | null; plans: number; decisions: number; chats: number; reload: () => Promise<void> } }
+export default function AccountPanel({ session, recovery, onRecovered, onContinue, workspace }: Props) {
   const [mode, setMode] = useState<'signin' | 'signup' | 'reset'>('signin');
   const [email, setEmail] = useState(''); const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false); const [message, setMessage] = useState<string | null>(null);
@@ -53,16 +54,25 @@ export default function AccountPanel({ session, recovery, onRecovered, onContinu
     </div> : session && !recovery ? <div className="setup-notice">
       <p className="text-sm">Signed in as <strong>{session.user.email}</strong></p>
       <p className="text-sm">Your plans and history belong to this account. Demo records are kept separate and are not uploaded automatically.</p>
-      <div className="button-row"><button className="primary-button" onClick={onContinue}>Open workspace</button><button className="secondary-button" disabled={busy} onClick={() => void signOut()}>{busy ? 'Signing out…' : 'Sign out'}</button></div>
+      <div className="account-storage" aria-busy={workspace.loading || workspace.saving}>
+        <h3>Saved workspace</h3>
+        <p role="status">{workspace.error ? 'Your saved workspace is unavailable.' : workspace.loading ? 'Loading saved plans and history…' : workspace.saving ? 'Saving to your account…' : 'Your saved plans and history are loaded.'}</p>
+        {workspace.error ? <p className="form-error" role="alert">{workspace.error}</p> : !workspace.loading && <>
+          <p>{workspace.plans} saved scenarios · {workspace.decisions} decisions · {workspace.chats} chat entries</p>
+          {workspace.syncedAt && <p className="field-note">Last synced <time dateTime={workspace.syncedAt}>{new Date(workspace.syncedAt).toLocaleTimeString()}</time>. History includes up to 500 recent decisions and 200 chat entries.</p>}
+        </>}
+        <button className="secondary-button" disabled={workspace.loading || workspace.saving} onClick={() => void workspace.reload()}>{workspace.error ? 'Retry connection' : 'Refresh saved workspace'}</button>
+      </div>
+      <div className="button-row"><button className="primary-button" disabled={workspace.loading || Boolean(workspace.error)} onClick={onContinue}>Open workspace</button><button className="secondary-button" disabled={busy || workspace.saving} onClick={() => void signOut()}>{busy ? 'Signing out…' : 'Sign out'}</button></div>
     </div> : <form onSubmit={event => void submit(event)} className="account-form" aria-busy={busy}>
       {!recovery && <div className="auth-options" aria-label="Account action">
-        <button type="button" aria-pressed={mode === 'signin'} onClick={() => { setMode('signin'); setError(null); setMessage(null); }}>Sign in</button>
-        <button type="button" aria-pressed={mode === 'signup'} onClick={() => { setMode('signup'); setError(null); setMessage(null); }}>Create account</button>
+        <button type="button" disabled={busy} aria-pressed={mode === 'signin'} onClick={() => { setMode('signin'); setPassword(''); setError(null); setMessage(null); }}>Sign in</button>
+        <button type="button" disabled={busy} aria-pressed={mode === 'signup'} onClick={() => { setMode('signup'); setPassword(''); setError(null); setMessage(null); }}>Create account</button>
       </div>}
       {!recovery && <label>Email address<input type="email" required autoComplete="email" value={email} disabled={busy} onChange={event => setEmail(event.target.value)} /></label>}
       {(recovery || mode !== 'reset') && <label>Password<input type="password" required minLength={mode === 'signup' || recovery ? 12 : undefined} autoComplete={mode === 'signin' && !recovery ? 'current-password' : 'new-password'} value={password} disabled={busy} onChange={event => setPassword(event.target.value)} />{(mode === 'signup' || recovery) && <span className="field-note">Use at least 12 characters.</span>}</label>}
       <button className="primary-button" disabled={busy}>{busy ? 'Please wait…' : recovery ? 'Update password' : mode === 'signin' ? 'Sign in' : mode === 'signup' ? 'Create account' : 'Send reset link'}</button>
-      {!recovery && <button type="button" className="text-button" onClick={() => { setMode(mode === 'reset' ? 'signin' : 'reset'); setError(null); setMessage(null); }}>{mode === 'reset' ? 'Back to sign in' : 'Forgot your password?'}</button>}
+      {!recovery && <button type="button" disabled={busy} className="text-button" onClick={() => { setMode(mode === 'reset' ? 'signin' : 'reset'); setPassword(''); setError(null); setMessage(null); }}>{mode === 'reset' ? 'Back to sign in' : 'Forgot your password?'}</button>}
     </form>}
     {message && <p className="mt-4 text-sm" role="status">{message}</p>}
     {error && <p className="form-error" role="alert">{error}</p>}

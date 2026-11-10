@@ -6,8 +6,8 @@ One capacity planner compares waiting-time pressure and available specialist hou
 
 ## Immediate work
 
-1. Complete the non-destructive backend retirement described in ROLE_RETIREMENT.md. Preserve personal records and historical team rows while disabling the old team APIs.
-2. Verify the existing account can still save/reload its private scenario and decision history.
+1. Independently verify hosted retirement permissions with `supabase/verify_backend.sql`. The user reports applying the retirement SQL; personal records and historical team rows remain preserved.
+2. Finish hosted signed-in checks for decision/chat persistence, password recovery and two-account isolation. Personal plan reload is user-confirmed. Account now includes loaded-record counts, sync time and connection retry; local database tests cover personal persistence and access restrictions.
 3. Keep the problem and limits clear: fictional aggregate data, fixed rules, no demonstrated clinical outcomes or reduced waiting times, and no live scheduling integration.
 4. Keep **Validation status: pending** until a real hospital-operations or health-administration contact is available. The README contains four neutral interview questions. Do not invent a contact, quote, response, market estimate or claim of adoption.
 

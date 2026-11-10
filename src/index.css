@@ -158,6 +158,9 @@
   .setup-notice { padding: 24px; background: #eeece3; border-radius: 5px; margin-top: 28px; }
   .setup-notice h3 { font-size: 24px; margin-bottom: 12px; }
   .setup-notice p { font-size: 13px; line-height: 1.8; margin-bottom: 20px; }
+  .account-storage { padding: 20px 0; margin: 20px 0; border-top: 1px solid #cbc9be; border-bottom: 1px solid #cbc9be; }
+  .account-storage h3 { font-size: 18px; }
+  .account-storage p { margin-bottom: 12px; }
   .button-row { display: flex; flex-wrap: wrap; gap: 12px; }
   .account-form { display: flex; flex-direction: column; gap: 22px; margin-top: 30px; }
   .auth-options { display: flex; gap: 24px; border-bottom: 1px solid var(--rule); }

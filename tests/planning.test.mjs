@@ -89,6 +89,6 @@ test('workspace reads and writes carry the owner ID, and real chat-audit rows ar
 test('database failures propagate; saves cannot silently succeed or fall back to demo storage', async () => {
   const repo = createWorkspaceRepository(mockClient(true));
   await assert.rejects(() => repo.load(userId), /could not be loaded/);
-  await assert.rejects(() => repo.savePlan(userId, 'baseline', changes), /not saved/);
+  await assert.rejects(() => repo.savePlan(userId, 'baseline', changes), /could not be confirmed/);
   await assert.rejects(() => repo.saveChat(userId, { id: 'chat', stage: 'baseline', question: 'test', sourceIds: [], summary: 'test', mode: 'offline' }), /not confirmed/);
 });

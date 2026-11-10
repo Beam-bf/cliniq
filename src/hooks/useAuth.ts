@@ -16,12 +16,13 @@ export function useAuth() {
       if (!active) return;
       setSession(next); setLoading(false); setError(null);
       if (event === 'PASSWORD_RECOVERY') setRecovery(true);
+      if (event === 'SIGNED_OUT') setRecovery(false);
     });
     supabase.auth.getSession().then(({ data, error: failure }) => {
       if (!active || authEventReceived) return;
       setSession(data.session); setLoading(false);
       if (failure) setError('Your account session could not be restored. Please sign in again.');
-    }).catch(() => { if (active) { setLoading(false); setError('Account service is unavailable.'); } });
+    }).catch(() => { if (active && !authEventReceived) { setLoading(false); setError('Account service is unavailable.'); } });
     return () => { active = false; subscription.unsubscribe(); };
   }, []);
   return { session, loading, error, recovery, finishRecovery: () => setRecovery(false) };

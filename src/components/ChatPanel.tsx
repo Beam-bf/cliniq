@@ -5,7 +5,7 @@ import type { AuditEntry, StageId } from '@/types';
 import type { ScenarioAdjustments } from '@/planning/scenarioPlanning';
 import { supabase } from '@/lib/supabase';
 
-interface Props { stageId: StageId; audit: AuditEntry[]; adjustments: ScenarioAdjustments; currentView: string; isOpen: boolean;
+interface Props { stageId: StageId; audit: AuditEntry[]; adjustments: ScenarioAdjustments; currentView: string; isOpen: boolean; disabled: boolean;
   accessToken?: string; onAudit: (entry: ChatAudit) => void | Promise<void>; onSource: (id: string) => void }
 interface Message { question: string; response: ChatAnswer }
 const suggestions: Record<StageId, string[]> = {
@@ -14,7 +14,7 @@ const suggestions: Record<StageId, string[]> = {
   'specialist-leave': ['What does the forecast show during specialist leave?', 'What tele-pooling is proposed?'],
 };
 
-export default function ChatPanel({ stageId, audit, adjustments, currentView, isOpen, accessToken, onAudit, onSource }: Props) {
+export default function ChatPanel({ stageId, audit, adjustments, currentView, isOpen, disabled, accessToken, onAudit, onSource }: Props) {
   const [question, setQuestion] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [busy, setBusy] = useState(false);
@@ -31,7 +31,7 @@ export default function ChatPanel({ stageId, audit, adjustments, currentView, is
     wasBusy.current = busy;
   }, [busy, isOpen]);
   async function send(text = question) {
-    if (locked.current) return;
+    if (locked.current || disabled) return;
     const problem = inputError(text);
     if (problem) { setError(problem); return; }
     locked.current = true; setBusy(true); setError(null);
@@ -75,14 +75,14 @@ export default function ChatPanel({ stageId, audit, adjustments, currentView, is
           <div className="chat-citations">{message.response.sourceIds.map(id => <a key={id} href={`#evidence?source=${id}`} onClick={event => { event.preventDefault(); onSource(id); }}>{id}</a>)}</div></div>
         </li>)}
       </ol>
-      {messages.length < 2 && <div className="chat-suggestions">{suggestions[stageId].map(text => <button key={text} type="button" disabled={busy} onClick={() => { setQuestion(text); void send(text); }}>{text} <span aria-hidden="true">↗</span></button>)}</div>}
+      {messages.length < 2 && <div className="chat-suggestions">{suggestions[stageId].map(text => <button key={text} type="button" disabled={busy || disabled} onClick={() => { setQuestion(text); void send(text); }}>{text} <span aria-hidden="true">↗</span></button>)}</div>}
       <div ref={messageEnd} />
       </div>
       <form onSubmit={event => { event.preventDefault(); void send(); }} className="chat-composer">
         <label htmlFor="planning-question" className="sr-only">Planning question (600 characters maximum)</label>
-        <div className="chat-input-row"><textarea ref={composer} id="planning-question" rows={2} value={question} onChange={event => setQuestion(event.target.value)} onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); void send(); } }} placeholder="Ask about this scenario…" maxLength={600} disabled={busy} aria-describedby="chat-state" />
-        <button disabled={busy || !question.trim()} className="primary-button" aria-label="Send question">{busy ? '…' : 'Send'}</button></div>
-        <p id="chat-state" role="status" className={error ? 'form-error' : 'field-note'}>{error ?? (busy ? 'Checking your scenario…' : 'Read-only · Enter to send, Shift+Enter for a new line')}</p>
+        <div className="chat-input-row"><textarea ref={composer} id="planning-question" rows={2} value={question} onChange={event => setQuestion(event.target.value)} onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); void send(); } }} placeholder="Ask about this scenario…" maxLength={600} disabled={busy || disabled} aria-describedby="chat-state" />
+        <button disabled={busy || disabled || !question.trim()} className="primary-button" aria-label="Send question">{busy ? '…' : 'Send'}</button></div>
+        <p id="chat-state" role="status" className={error ? 'form-error' : 'field-note'}>{error ?? (busy ? 'Checking your scenario…' : disabled ? 'The assistant will be ready when your workspace finishes loading or saving. If loading fails, retry the connection.' : 'Read-only · Enter to send, Shift+Enter for a new line')}</p>
       </form>
   </div>;
 }
