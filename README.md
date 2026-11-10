@@ -1,9 +1,13 @@
-# HalaCapacity AI
+# ClinIQ
+
+Ask ClinIQ now has tested local Cloudflare inference with restricted, server-rendered algorithm results and pgvector evidence. Start `npm.cmd run kb:serve` and `npm.cmd run dev`; sign in for the configured account workspace. See [LIVE_CHAT_VERIFICATION.md](LIVE_CHAT_VERIFICATION.md) for real outputs, setup, restrictions and remaining limits.
+
+The latest conversation, policy-relevance and offline-simulation improvements are documented in [ASK_HALA_UPGRADE_VERIFICATION.md](ASK_HALA_UPGRADE_VERIFICATION.md). Use [HACKATHON_DEMO.md](HACKATHON_DEMO.md) for the demonstration sequence. `npm run test:all` runs both repeatable suites; explicit `test:live`, `test:browser` and `security:secrets` commands cover their separate boundaries.
 
 The healthcare policy knowledge-base increment is documented in
 [knowledge/README.md](knowledge/README.md). It adds verified document ingestion,
 local neural embeddings and a real PostgreSQL/pgvector retrieval service, with
-Policy Agent findings in the existing Coordinator, approvals and Ask Hala chat.
+Policy Agent findings in the existing Coordinator, approvals and Ask ClinIQ chat.
 The original clinic agents and scenarios remain intact. Start with
 `npm.cmd run kb:prepare-model`, `npm.cmd run kb:ingest`, then run
 `npm.cmd run kb:serve` alongside the existing `npm.cmd run dev`.
@@ -40,7 +44,7 @@ A first descriptive analysis uses Dubai Health Authority's published **2024** wo
 - **History:** search recorded decisions and chat summaries, filter by scenario, and refresh connected-account records.
 - **Help:** short walkthrough, privacy/storage information, expandable limitations and draft ITU concept alignment.
 - **Account:** real Supabase email/password sign-up, sign-in, confirmation and password-reset flows when configured. Without configuration, this page clearly identifies the browser demo; it does not simulate a login.
-- **Ask Hala:** bottom-right floating assistant, available across views. Suggested questions send immediately; Enter sends and Shift+Enter adds a line. Escape closes the panel and restores launcher focus. Click citations to open Evidence and focus the source. Closing the panel preserves the conversation; changing scenarios or account resets it.
+- **Ask ClinIQ:** bottom-right floating assistant, available across views. Suggested questions send immediately; Enter sends and Shift+Enter adds a line. Escape closes the panel and restores launcher focus. Click citations to open Evidence and focus the source. Closing the panel preserves the conversation; changing scenarios or account resets it.
 - **Export:** download a JSON briefing of the current scenario, findings, review statuses and visible history. Account credentials are not included.
 
 ## Run
@@ -63,7 +67,7 @@ npm run backend:check
 npm run preview
 ```
 
-Vite serves the client and proxies `/api/policy` to the local policy service when running. It does not run Cloudflare Pages Functions; ordinary LLM chat falls back to clearly labelled offline templates. Policy questions use real vector retrieval or explicitly report unavailable evidence. `build` outputs `dist/` and does not deploy anything.
+Vite serves the client and proxies `/api/policy` and `/api/chat` to the local Node knowledge/chat service when running. The bridge executes the existing chat handler with server-only provider configuration, deterministic planning tools and real vector retrieval. It does not deploy or emulate Cloudflare Pages hosting. Unavailable or invalid live selections fall back to clearly labelled checked results. `build` outputs `dist/` and does not deploy anything.
 
 ## Working together
 
@@ -118,13 +122,13 @@ See [CHATBOT.md](CHATBOT.md) for retrieval, limits, provider configuration, and 
 1. Open Overview and switch between Baseline, Winter surge and Specialist leaves. The cases are independent; specialist leave is based on baseline, not winter surge.
 2. In Decisions, select the forecast recommendation, enter a fictional reason and record a decision.
 3. In Planner, select Clinic Alpha / Psychiatry. Change current wait to 8.5 weeks and free hours to 2; click **Apply & recalculate**. The findings change and the altered plan's recommendation awaits a fresh review.
-4. Open Ask Hala and ask “Give me a summary of free hours and referrals”. Offline mode uses the currently applied values. Ask “What psychiatry forecast risks appear?” to see related verified-source chips.
+4. Open Ask ClinIQ and ask “Give me a summary of free hours and referrals”. Offline mode uses the currently applied values. Ask “Explain Alpha psychiatry forecast” for the calculated trend and its limits. Policy passages appear only for relevant policy questions, such as telehealth consent.
 5. Open History to search the question and decision. Reload to verify demo persistence. Do not use real patient data to test input rejection.
 6. Open Account to see connection status. Once activated, use two separate test accounts to verify that plans and history do not cross account boundaries.
 
 ## Verification
 
-The application suite includes **33 tests/subtests**, including the original 29 and clinic-number, follow-up and input-boundary checks. The separate `npm run test:kb` suite includes **16 checks** for original-table review, actual PostgreSQL/vector retrieval, source provenance, unsupported questions, policy follow-ups and applicability boundaries after model/document preparation. Retirement tests verify that personal access still works, historical rows are retained, former team Admin calls are denied, repeat retirement is safe, and old team chat requests are rejected. They do not prove that the retirement SQL has been applied to the hosted project.
+The application suite includes **61 tests/subtests**, including conversation, restricted-provider, clinic-number, simulation and follow-up checks. The separate `npm run test:kb` suite includes **20 checks** for original-table review, actual PostgreSQL/vector retrieval, citation relevance, document-instruction rejection and applicability boundaries. `npm run test:all` runs both. Separate actual Cloudflare/browser results are documented in [ASK_HALA_UPGRADE_VERIFICATION.md](ASK_HALA_UPGRADE_VERIFICATION.md). Local retirement tests do not prove that the retirement SQL has been applied correctly to the hosted project.
 
 An isolated installed-Chrome session verified page navigation, a real demo approval, input editing/recalculation, review invalidation after editing, the floating assistant, Escape close/focus return, contextual offline answers, clinical-input rejection, repeated source navigation/focus, JSON export content, persisted history after reload, scenario isolation and the unconfigured account state. The page and widget fit the tested 390×844 mobile viewport. Screenshots are in ignored `.browser-qa/`. No new browser/test packages were installed.
 

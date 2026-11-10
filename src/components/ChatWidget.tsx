@@ -25,9 +25,9 @@ export default function ChatWidget(props: Props) {
   }, [open, close]);
   return <>
     <aside id="planning-assistant" ref={panel} role="dialog" aria-modal="false" aria-labelledby="assistant-title" className="chat-widget" hidden={!open}>
-      <header className="chat-widget-header"><div><h2 id="assistant-title">Hala assistant</h2><p>{SCENARIO_STAGES[props.stageId].label.replace(/^Stage \d /, '')} · Planning support</p></div><button type="button" onClick={close} aria-label="Close assistant"><X size={20} /></button></header>
+      <header className="chat-widget-header"><div><h2 id="assistant-title">ClinIQ assistant</h2><p>{SCENARIO_STAGES[props.stageId].label.replace(/^Stage \d /, '')}, Planning support</p></div><button type="button" onClick={close} aria-label="Close assistant"><X size={20} /></button></header>
       <ChatPanel key={props.stageId} {...props} isOpen={open} onSource={id => { setOpen(false); props.onSource(id); }} />
     </aside>
-    <button ref={launcher} type="button" className="chat-launcher" aria-controls="planning-assistant" aria-expanded={open} aria-label={open ? 'Close planning assistant' : 'Ask Hala, planning assistant'} onClick={() => open ? close() : setOpen(true)}><MessageSquare size={20} aria-hidden="true" /><span>{open ? 'Close assistant' : 'Ask Hala'}</span></button>
+    <button ref={launcher} type="button" className="chat-launcher" aria-controls="planning-assistant" aria-expanded={open} aria-label={open ? 'Close planning assistant' : 'Ask ClinIQ, planning assistant'} onClick={() => open ? close() : setOpen(true)}><MessageSquare size={20} aria-hidden="true" /><span>{open ? 'Close assistant' : 'Ask ClinIQ'}</span></button>
   </>;
 }

@@ -47,7 +47,7 @@ export function forecastWait(record: ClinicSpecialtyRecord, seasonalFactor: numb
 
   const confidence = fit >= 0.8 ? 'High' : fit >= 0.5 ? 'Medium' : 'Low';
   const reliability = {
-    High: 'Waits have moved steadily, so the trend is a reasonable guide.',
+    High: 'Recent observations follow a consistent pattern; future outcomes have not been validated.',
     Medium: 'Waits have moved with some noise, so timing is approximate.',
     Low: 'Recent waits are volatile, so treat the timing as indicative only.',
   }[confidence];
@@ -82,7 +82,7 @@ export function runForecastAgent(stage: ScenarioStage): AgentResult {
         ? `No clinic and specialty pair is forecast to reach the ${WAIT_LIMIT_WEEKS}-week limit within ${FORECAST_HORIZON_WEEKS} weeks.`
         : `${atRisk.length} of ${forecasts.length} clinic and specialty pairs are forecast to reach the ${WAIT_LIMIT_WEEKS}-week limit within ${FORECAST_HORIZON_WEEKS} weeks.`,
     evidence: nearest.map(({ record, forecast }) => {
-      const confidence = `${forecast.confidence} confidence. ${forecast.confidenceNote}`;
+      const confidence = `${forecast.confidence} trend consistency, not predictive accuracy. ${forecast.confidenceNote}`;
       return `${CLINIC_NAMES[record.clinicId]} ${SPECIALTY_LABELS[record.specialtyId]}: now ${forecast.currentWeeks.toFixed(1)} weeks, ${describeLimitClause(forecast.weeksUntilLimit)}. ${confidence}`;
     }),
     recommendation:

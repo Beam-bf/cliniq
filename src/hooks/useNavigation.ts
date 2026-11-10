@@ -14,7 +14,7 @@ export function useNavigation() {
     window.addEventListener('hashchange', update);
     return () => window.removeEventListener('hashchange', update);
   }, []);
-  useEffect(() => { document.title = `${PAGES[route.page]} · HalaCapacity AI`; }, [route.page]);
+  useEffect(() => { document.title = `${PAGES[route.page]}, ClinIQ`; }, [route.page]);
   const navigate = useCallback((page: Page, source?: string) => {
     window.location.hash = `${page}${source ? `?source=${encodeURIComponent(source)}` : ''}`;
     setRoute({ page, source: source ?? null });

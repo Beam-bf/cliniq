@@ -29,7 +29,14 @@ export function policyTopic(question: string): PolicyTopic | undefined {
   return TOPICS.find(([pattern]) => pattern.test(question))?.[1];
 }
 export function isPolicyQuestion(question: string, previousPolicyQuery?: string) {
-  return /policy|policies|regulat|scope|privileg|licen[cs]|DHA|\blaw\b|legal|permitted|consent|retention|telehealth|teleconsultation|rules? (?:apply|for)/i.test(question) || Boolean(previousPolicyQuery && policyFollowup.test(question));
+  const explicit = /policy|policies|regulat|scope of practice|privileg|licen[cs]|DHA|\blaw\b|legal|permitted|consent|retention|telehealth|teleconsultation|rules? (?:apply|for)/i.test(question);
+  const operational = /forecast|waiting|capacity|free hours|referrals|routing|task.?shift|tele.?pool|simulation|what.if/i.test(question);
+  return explicit || Boolean(previousPolicyQuery && !operational && policyFollowup.test(question));
+}
+
+export function policyEvidenceMatches(question: string, previousQuery: string | undefined, evidence: { documentId: string; pdfPage: number; passage: string }[]) {
+  const { topic } = resolvePolicyQuestion(question, previousQuery);
+  return evidence.every(hit => topic && topic.documents.includes(hit.documentId) && topic.pages.includes(hit.pdfPage) && topic.anchor.test(hit.passage));
 }
 export function resolvePolicyQuestion(question: string, previousPolicyQuery?: string) {
   // Only anaphoric follow-ups inherit prior topic context. Explicit new topics

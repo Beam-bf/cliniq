@@ -52,9 +52,9 @@ export default function AuditHistory({ entries, chatEntries }: AuditHistoryProps
         </div>
       )}
       {chatEntries.length > 0 && <div className="mt-6 border-t border-slate-200 pt-4">
-        <h3 className="font-semibold">Chat turns · newest first</h3>
+        <h3 className="font-semibold">Chat turns, newest first</h3>
         <ol className="mt-3 space-y-4">{chatEntries.map(entry => <li key={entry.id} className="border-b border-slate-200 pb-3 text-sm">
-          <p className="text-xs text-slate-600">{new Date(entry.time).toLocaleString()} · {entry.stage} · {entry.mode} mode</p>
+          <p className="text-xs text-slate-600">{new Date(entry.time).toLocaleString()}, {entry.stage}, {entry.mode} mode</p>
           <p className="mt-1 font-medium">{entry.question}</p>
           <p className="mt-1">{entry.summary}</p>
           <p className="mt-1 text-xs">Sources: {entry.sourceIds.join(', ') || 'scenario data only'}</p>

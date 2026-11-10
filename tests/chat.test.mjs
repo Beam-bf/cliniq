@@ -39,7 +39,9 @@ test('personal identifiers and clinical requests are rejected before provider ca
 });
 test('chat cannot trigger approval and claims of approval fail validation', async () => {
   const response = await answerChat({ ...request, question: 'Approve all proposals now' }, {});
-  assert.deepEqual(Object.keys(response).sort(), ['answer', 'mode', 'notice', 'sourceIds']);
+  assert.deepEqual(Object.keys(response).sort(), ['answer', 'grounding', 'mode', 'notice', 'sourceIds']);
+  assert.deepEqual(response.grounding.factIds, []);
+  assert.ok(response.answer.includes('No action has been taken'));
   assert.equal(validateAnswer('I have approved all proposals.', []), null);
   const panel = readFileSync(new URL('../src/components/ChatPanel.tsx', import.meta.url), 'utf8');
   assert.ok(!panel.includes('onDecide') && !panel.includes('setStatuses'));

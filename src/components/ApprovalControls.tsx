@@ -60,7 +60,7 @@ export default function ApprovalControls({ proposal, status, onDecide, disabled 
           <p className="mt-2 text-base font-semibold text-slate-900">{proposal.recommendation}</p>
           <p className="mt-3 text-sm text-slate-600">{proposal.summary}</p>
           {proposal.policyReview && <div className="mt-4"><PolicyKnowledgeReview finding={proposal.policyReview} /></div>}
-          <details className="review-evidence"><summary>Operational evidence · {proposal.evidence.length} observations</summary>
+          <details className="review-evidence"><summary>Operational evidence, {proposal.evidence.length} observations</summary>
           <ul className="mt-3 list-inside list-disc space-y-2 text-sm text-slate-600">
             {proposal.evidence.map((item) => (
               <li key={item}>{item}</li>

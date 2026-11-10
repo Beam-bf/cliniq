@@ -19,7 +19,7 @@ export default function ScenarioPlanner({ stage, adjustments, disabled, onApply,
       <label>Specialty<select value={specialty} onChange={event => setSpecialty(event.target.value as typeof specialty)}>{SPECIALTY_IDS.map(id => <option key={id} value={id}>{SPECIALTY_LABELS[id]}</option>)}</select></label>
     </div>
     <div className="planner-layout"><div className="planner-summary">
-      <p className="eyebrow">Current applied values · scenario data</p><h3>{CLINIC_NAMES[clinic]}</h3><p className="text-sm text-slate-600">{SPECIALTY_LABELS[specialty]}</p>
+      <p className="eyebrow">Current applied values, scenario data</p><h3>{CLINIC_NAMES[clinic]}</h3><p className="text-sm text-slate-600">{SPECIALTY_LABELS[specialty]}</p>
       <div className="planner-wait"><strong>{latestWaitWeeks(record).toFixed(1)}<span> weeks</span></strong><Sparkline values={record.waitingWeeksHistory} label="Six-week waiting history" /></div>
       <p className="text-sm">{forecast.weeksUntilLimit === null ? 'No rising trend toward the limit.' : forecast.weeksUntilLimit === 0 ? 'The fitted forecast is already at the 8-week limit.' : `The fitted trend reaches the 8-week limit in approximately ${forecast.weeksUntilLimit} weeks.`}</p>
       <dl className="planner-facts"><div><dt>Free hours / week</dt><dd>{record.freeSpecialistHoursPerWeek}</dd></div><div><dt>Referrals / week</dt><dd>{record.referralsPerWeek}</dd></div></dl>

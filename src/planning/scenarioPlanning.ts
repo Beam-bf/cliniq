@@ -20,7 +20,7 @@ export function validateAdjustments(stageId: StageId, value: unknown): ScenarioA
     const { waitingWeeks, freeHours, referrals } = adjustment as RecordAdjustment;
     if (![waitingWeeks, freeHours, referrals].every(item => typeof item === 'number' && Number.isFinite(item)) ||
       waitingWeeks < 0 || waitingWeeks > 52 || freeHours < 0 || freeHours > 168 || referrals < 0 || referrals > 10000 || !Number.isInteger(referrals))
-      throw new Error('Use 0–52 waiting weeks, 0–168 free hours and 0–10,000 whole referrals.');
+      throw new Error('Use 0 to 52 waiting weeks, 0 to 168 free hours and 0 to 10,000 whole referrals.');
     if (waitingWeeks !== latestWaitWeeks(record) || freeHours !== record.freeSpecialistHoursPerWeek || referrals !== record.referralsPerWeek)
       result[key] = { waitingWeeks, freeHours, referrals };
   }

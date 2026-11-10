@@ -3,7 +3,8 @@ import type { ChatRequest } from '../../src/chat/core';
 
 export interface BackendEnv { SUPABASE_URL?: string; SUPABASE_PUBLISHABLE_KEY?: string }
 export class AccountContextError extends Error {
-  constructor(message: string, public status: number) { super(message); }
+  public status: number;
+  constructor(message: string, status: number) { super(message); this.status = status; }
 }
 export async function loadAccountContext(request: Request, body: ChatRequest, env: BackendEnv, fetcher: typeof fetch): Promise<ChatRequest> {
   if ('teamId' in body || 'submissionId' in body) {

@@ -36,7 +36,7 @@ test('the LLM receives the guiding prompt, current view and adjusted scenario, w
   let sent;
   const answer = await answerChat(question, { AI_PROVIDER: 'cloudflare', AI_API_KEY: 'not-a-real-key', AI_ACCOUNT_ID: 'test', AI_MODEL: 'test' }, async (_url, options) => {
     sent = JSON.parse(options.body);
-    return Response.json({ result: { response: 'Scenario data: Alpha psychiatry waits 8.5 weeks. [S2]' } });
+    return Response.json({ result: { response: JSON.stringify({ factIds: JSON.parse(sent.messages[1].content).APPROVED_RESULTS.map(f => f.id) }) } });
   });
   assert.equal(answer.mode, 'live');
   assert.ok(sent.messages[0].content.includes('ROLE AND PRODUCT'));

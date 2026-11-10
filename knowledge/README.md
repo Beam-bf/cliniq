@@ -152,7 +152,7 @@ does not accept arbitrary ingestion URLs or execute instructions in document tex
 Its origin checks permit the local demo; remote binding requires a server-side
 `POLICY_API_TOKEN` of at least 24 characters. Credentials never use `VITE_` variables.
 
-The Node CLI/server reads process environment directly, without automatically loading `.env.local` or `.dev.vars`. `POLICY_HOST` defaults to `127.0.0.1`, `POLICY_PORT` to `8788`, and `POLICY_MODEL_DIR` to `.knowledge/models`. Preparation and inference must use the same model location. The CLI/server uses the embedded store at `.knowledge/database`; there is no external `DATABASE_URL` adapter. Supabase account storage is separate. For hosted forwarding, `POLICY_SERVICE_TOKEN` must match the Node service's `POLICY_API_TOKEN`.
+The Node server loads whitelisted server settings from `.env`, `.env.local` and `.dev.vars`, with process environment taking precedence. The ingestion CLI still reads process environment directly. `POLICY_HOST` defaults to `127.0.0.1`, `POLICY_PORT` to `8788`, and `POLICY_MODEL_DIR` to `.knowledge/models`. Preparation and inference must use the same model location. The CLI/server uses the embedded store at `.knowledge/database`; there is no external `DATABASE_URL` adapter. Supabase account storage is separate. For hosted forwarding, `POLICY_SERVICE_TOKEN` must match the Node service's `POLICY_API_TOKEN`.
 
 For a later hosted integration, `functions/api/policy.ts` is an HTTP adapter:
 set **server-only** `POLICY_SERVICE_URL` to the HTTPS service origin and
@@ -172,8 +172,8 @@ npm.cmd run typecheck
 npm.cmd run build
 ```
 
-The application suite has 33 tests/subtests, including the original 29. The knowledge/capacity suite has
-16 tests covering original PDF-table review, vector storage, idempotence, semantic relevance,
+The application suite has 61 tests/subtests. The knowledge/capacity suite has
+20 tests covering original PDF-table review, vector storage, idempotence, semantic relevance,
 unsupported questions, date/type filtering, inaccurate citations/quotes,
 conflicting recommendations, no automatic authorization, exact offsets/source
 checksums, durable audit snapshots and credential-safe proxy behavior. These are
@@ -209,7 +209,7 @@ Added files:
 
 - `knowledge/manifest.ts`, `ingest.ts`, `embeddings.ts`, `store.ts`: reviewed corpus, extraction, model and pgvector persistence.
 - `knowledge/policyAgent.ts`, `api.ts`, `server.ts`, `cli.ts`, `register.mjs`: applicability tool, guarded service, commands and native Node TypeScript alias resolution.
-- `knowledge/tests/retrieval.test.mjs`: 13 integration tests using actual PDFs/model/PostgreSQL vectors; `knowledge/tests/capacity.test.mjs`: three source-table/provenance checks.
+- `knowledge/tests/retrieval.test.mjs`: 17 integration tests using actual PDFs/model/PostgreSQL vectors; `knowledge/tests/capacity.test.mjs`: three source-table/provenance checks.
 - `knowledge/README.md`, `NOTICE.md`, `licenses/ITUAIReadiness-MIT.txt`: architecture, verification and attribution.
 - `functions/api/policy.ts`: optional credential-safe Pages adapter.
 - `src/policy/knowledgeTypes.ts`, `retrievalClient.ts`, `src/hooks/usePolicyAssessment.ts`, `src/components/PolicyKnowledgeReview.tsx`: shared types, retrieval validation and existing-UI integration.

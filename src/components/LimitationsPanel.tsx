@@ -5,7 +5,7 @@ const LIMITATIONS = [
   'No patient data is used or stored. Figures are aggregate weekly operational numbers only.',
   'Agents are rule-based calculations, not machine learning. They follow fixed formulas that anyone can read in the code.',
   'The forecast is a simple straight-line trend over the last 6 weeks, with one seasonal multiplier. It ignores many real drivers such as staff leave timing, demand shocks, and policy changes.',
-  'Forecast confidence is based only on how well a straight line fits six points. Treat it as a rough signal, not a prediction.',
+  'Forecast trend consistency measures only how well a straight line fits six observations. It is not validated predictive accuracy or evidence of future clinical outcomes.',
   'Policy passages are matched by keyword against short quoted extracts. Matching is not a judgement of whether a passage supports a recommendation, so a reviewer must check each link.',
   'Only sources marked verified are used as evidence. Unverified items are shown for transparency and are never cited.',
   'This tool has not been validated for real clinical, operational, or planning use. Do not use its output to change schedules, staffing, or care without independent review.',

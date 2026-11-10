@@ -33,7 +33,7 @@ export async function openKnowledge(dataDir: string = resolve('.knowledge/databa
   } catch (failure) { try { await db.close(); } finally { await release(); } throw failure; }
 
   return {
-    async recordAudit(kind: 'search' | 'assessment', snapshot: unknown, id: string = randomUUID()) {
+    async recordAudit(kind: 'search' | 'assessment' | 'chat', snapshot: unknown, id: string = randomUUID()) {
       await db.query('INSERT INTO kb_audit(id,kind,snapshot) VALUES($1,$2,$3)', [id, kind, JSON.stringify(snapshot)]);
       return id;
     },

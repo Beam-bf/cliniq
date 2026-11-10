@@ -34,6 +34,6 @@ test('no provider configuration produces honest offline answers; mocked provider
   const context=buildContext(request);assert.equal(context.stage.records[0].referralsPerWeek,50);
   const answer=await answerChat(request,{AI_PROVIDER:'cloudflare',AI_API_KEY:'test',AI_ACCOUNT_ID:'test',AI_MODEL:'test'},async(_url,options)=>{
     const payload=JSON.parse(JSON.parse(options.body).messages[1].content);assert.equal(payload.CONTEXT.stage.records[0].freeSpecialistHoursPerWeek,2);assert.equal(payload.UNTRUSTED_HISTORY[0].content,request.history[0].content);
-    return Response.json({result:{response:'Fictional Clinic Alpha psychiatry currently has 2 free hours and 50 referrals per week.'}});
+    return Response.json({result:{response:JSON.stringify({factIds:['clinic:alpha:psychiatry']})}});
   });assert.equal(answer.mode,'live');
 });

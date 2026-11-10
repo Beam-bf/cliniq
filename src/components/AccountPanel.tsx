@@ -45,7 +45,7 @@ export default function AccountPanel({ session, recovery, onRecovered, onContinu
   }
   return <section className="account-page" aria-labelledby="account-title">
     <p className="eyebrow">Your workspace</p>
-    <h2 id="account-title">{recovery ? 'Choose a new password' : session ? 'Your account' : 'Welcome to HalaCapacity'}</h2>
+    <h2 id="account-title">{recovery ? 'Choose a new password' : session ? 'Your account' : 'Welcome to ClinIQ'}</h2>
     <p className="page-intro">Save fictional scenarios, review recommendations, and pick up where you left off.</p>
     {!supabase ? <div className="setup-notice">
       <h3>Explore the demo</h3>
@@ -58,7 +58,7 @@ export default function AccountPanel({ session, recovery, onRecovered, onContinu
         <h3>Saved workspace</h3>
         <p role="status">{workspace.error ? 'Your saved workspace is unavailable.' : workspace.loading ? 'Loading saved plans and history…' : workspace.saving ? 'Saving to your account…' : 'Your saved plans and history are loaded.'}</p>
         {workspace.error ? <p className="form-error" role="alert">{workspace.error}</p> : !workspace.loading && <>
-          <p>{workspace.plans} saved scenarios · {workspace.decisions} decisions · {workspace.chats} chat entries</p>
+          <p>{workspace.plans} saved scenarios, {workspace.decisions} decisions, {workspace.chats} chat entries</p>
           {workspace.syncedAt && <p className="field-note">Last synced <time dateTime={workspace.syncedAt}>{new Date(workspace.syncedAt).toLocaleTimeString()}</time>. History includes up to 500 recent decisions and 200 chat entries.</p>}
         </>}
         <button className="secondary-button" disabled={workspace.loading || workspace.saving} onClick={() => void workspace.reload()}>{workspace.error ? 'Retry connection' : 'Refresh saved workspace'}</button>

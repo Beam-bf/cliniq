@@ -34,7 +34,7 @@ export default function IndicatorsSection({ records }: IndicatorsSectionProps) {
       <Panel
         className="lg:col-span-2"
         title="Waiting time by specialty and clinic"
-        description="Weeks to first appointment · elevated at 5 weeks, limit at 8. Lines show the last 6 weeks; each uses its own vertical scale."
+        description="Weeks to first appointment, elevated at 5 weeks, limit at 8. Lines show the last 6 weeks; each uses its own vertical scale."
       >
         <WaitingTimeMatrix records={records} />
       </Panel>

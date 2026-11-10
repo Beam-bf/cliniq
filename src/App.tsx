@@ -107,7 +107,7 @@ function App() {
       statuses: Object.fromEntries(report.proposals.map(proposal => [proposal.id, statuses[proposal.id] ?? 'pending'])),
       audit: audit.filter(entry => entry.stage === stageId), chatAudit: chatAudit.filter(entry => entry.stage === stageId) };
     const url = URL.createObjectURL(new Blob([JSON.stringify(body, null, 2)], { type: 'application/json' }));
-    const link = document.createElement('a'); link.href = url; link.download = `halacapacity-${stageId}.json`; link.click();
+    const link = document.createElement('a'); link.href = url; link.download = `cliniq-${stageId}.json`; link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000); setNotice('Current scenario briefing downloaded.');
   }
   const review = (id?: string) => { setSelectedId(id ?? null); go('decisions'); };
@@ -116,14 +116,14 @@ function App() {
     <DataBanner />
     <div className="briefing-layout">
       <aside className="scenario-rail" aria-label="Workspace navigation">
-        <a className="rail-brand" href="#overview">HalaCapacity <span>AI</span></a><p className="eyebrow">Capacity planner workspace</p>
+        <a className="rail-brand" href="#overview">ClinIQ</a><p className="eyebrow">Capacity planner workspace</p>
         <nav className="workspace-nav" aria-label="Main navigation">{NAV.map(({ page: target, icon: Icon }) => <a key={target} href={`#${target}`} aria-current={page === target ? 'page' : undefined}><Icon size={17} aria-hidden="true" /><span>{PAGES[target]}</span></a>)}</nav>
         <div className="rail-stages"><p className="eyebrow">Active scenario</p><StageSelector value={stageId} onChange={next => { setStageId(next); setSelectedId(null); setNotice(null); }} /></div>
-        <div className="rail-note"><p>6 fictional clinics · 4 specialties</p><a href="#account"><UserRound size={15} aria-hidden="true" />{signedIn ? 'Your account' : 'Sign in / Create account'}</a></div>
+        <div className="rail-note"><p>6 fictional clinics, 4 specialties</p><a href="#account"><UserRound size={15} aria-hidden="true" />{signedIn ? 'Your account' : 'Sign in / Create account'}</a></div>
       </aside>
       <div className="briefing-document">
         <header className="workspace-header"><div><p className="eyebrow">Workspace / {PAGES[page]}</p><h1>{PAGES[page]}</h1></div><div className="workspace-header-actions">
-          <span className="connection-label" role="status">{auth.loading ? 'Checking account…' : signedIn ? account.error ? 'Account unavailable' : account.loading ? 'Loading saved workspace…' : account.saving ? 'Saving to account…' : 'Account workspace' : 'Demo · browser only'}</span>
+          <span className="connection-label" role="status">{auth.loading ? 'Checking account…' : signedIn ? account.error ? 'Account unavailable' : account.loading ? 'Loading saved workspace…' : account.saving ? 'Saving to account…' : 'Account workspace' : 'Demo, browser only'}</span>
           <button type="button" className="secondary-button export-button" onClick={exportBriefing} disabled={workspaceBlocked}><Download size={15} aria-hidden="true" />Export</button>
           <button type="button" className="account-button" onClick={() => go('account')}><UserRound size={17} aria-hidden="true" />{signedIn ? 'Account' : 'Sign in'}</button>
         </div></header>
@@ -150,7 +150,7 @@ function App() {
               plans: Object.keys(account.data.adjustments).length, decisions: audit.length, chats: chatAudit.length, reload: account.reload }} />}
           </>}
         </main>
-        <footer className="briefing-footer"><span>HalaCapacity AI · Fictional planning demonstration</span><a href="#help">Help & limitations</a><a href="#account">Account</a></footer>
+        <footer className="briefing-footer"><span>ClinIQ, Fictional planning demonstration</span><a href="#help">Help & limitations</a><a href="#account">Account</a></footer>
       </div>
     </div>
     <ChatWidget key={auth.session?.user.id ?? 'demo'} disabled={workspaceBlocked || account.saving} stageId={stageId} adjustments={adjustments} currentView={page} audit={audit} accessToken={auth.session?.access_token} onAudit={recordChat} onSource={id => { navigate('evidence', id); requestAnimationFrame(() => window.dispatchEvent(new CustomEvent('halacapacity:source', { detail: id }))); }} />

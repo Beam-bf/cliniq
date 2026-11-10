@@ -23,7 +23,7 @@ export default function CoordinatorPanel({ report, statuses, selectedId, onSelec
   return (
     <div className="recommendation-sidebar">
       <details className={`coordinator-concerns ${report.conflicts.length || report.gaps.length ? 'has-concerns' : ''}`}>
-        <summary>{report.conflicts.length} concerns · {report.gaps.length} evidence gaps</summary>
+        <summary>{report.conflicts.length} concerns, {report.gaps.length} evidence gaps</summary>
         <div className="pt-4"><h3 className="mb-2 text-lg">Coordinator concerns</h3><IssueList items={report.conflicts} emptyMessage="No conflicts flagged." tone="warning" /><h3 className="mb-2 mt-4 text-lg">Evidence gaps</h3><IssueList items={report.gaps} emptyMessage="No evidence gaps flagged." tone="error" /></div>
       </details>
       <Panel title="Recommendations" description="Select one to review.">

@@ -46,7 +46,7 @@ Without both valid values, the app clearly stays in browser demo mode. With them
 
 Supply matching server variables `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` to the Pages function. It verifies the bearer token with `/auth/v1/user`, then fetches the saved plan and recent decisions under that user's token. Browser-supplied account adjustments/audit are replaced. Expired tokens are rejected; a missing or broken database does not produce an authenticated live answer.
 
-Live LLM calls additionally need `AI_PROVIDER=cloudflare`, `AI_API_KEY`, `AI_ACCOUNT_ID` and `AI_MODEL`. Keep these server-only, with no `VITE_` prefix. Plain `npm run dev` does not execute the Pages function and continues to use offline templates. No model API key has been supplied or tested.
+Live LLM calls additionally need `AI_PROVIDER=cloudflare`, `AI_API_KEY`, `AI_ACCOUNT_ID` and `AI_MODEL`. Keep these server-only, with no `VITE_` prefix. Run `npm run kb:serve` alongside `npm run dev`; Vite forwards `/api/chat` to the account-protected local server. The server loads local server settings from `.env`, `.env.local` and `.dev.vars`, with process environment taking precedence. Cloudflare inference has been tested locally; see [LIVE_CHAT_VERIFICATION.md](LIVE_CHAT_VERIFICATION.md) for actual results and limits.
 
 ## 6. Verify before claiming activation
 
