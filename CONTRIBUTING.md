@@ -1,14 +1,14 @@
-# Working together on HalaCapacity AI
+# Working together on ClinIQ
 
-Shared repository: https://github.com/Beam-bf/halacapacity-ai
+Shared repository: https://github.com/Beam-bf/cliniq
 
 ## First setup on each computer
 
 Accept the repository invitation, install Git and Node 24.22+, then:
 
 ```sh
-git clone https://github.com/Beam-bf/halacapacity-ai.git
-cd halacapacity-ai
+git clone https://github.com/Beam-bf/cliniq.git
+cd cliniq
 npm ci
 npm run dev
 ```

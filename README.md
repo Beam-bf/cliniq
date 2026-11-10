@@ -71,7 +71,7 @@ Vite serves the client and proxies `/api/policy` and `/api/chat` to the local No
 
 ## Working together
 
-The shared repository is https://github.com/Beam-bf/halacapacity-ai. See [CONTRIBUTING.md](CONTRIBUTING.md) for cloning, separate task branches, checks and pull requests. Local changes become available to collaborators after they are pushed. Each signed-in capacity planner has private account storage; collaborating on the code does not share application records.
+The shared repository is https://github.com/Beam-bf/cliniq. See [CONTRIBUTING.md](CONTRIBUTING.md) for cloning, separate task branches, checks and pull requests. Local changes become available to collaborators after they are pushed. Each signed-in capacity planner has private account storage; collaborating on the code does not share application records.
 
 ## Backend and account activation
 
