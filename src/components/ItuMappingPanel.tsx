@@ -2,7 +2,7 @@ import Panel from '@/components/Panel';
 
 const mappings = [
   ['Fictional data', 'SRC (source) analogy', 'Static scenario records and existing policy extracts; no live collection pipeline.'],
-  ['Rule-based agents', 'No M (model) equivalence claimed', 'Four fixed-rule calculations; no trained capacity-planning model.'],
+  ['Rule based agents', 'No M (model) equivalence claimed', 'Four fixed rule calculations; no trained capacity-planning model.'],
   ['Coordinator', 'MLFO orchestration analogy', 'Combines agent outputs and flags conflicts/gaps; no ML lifecycle management.'],
   ['Human review', 'Accountability theme', 'A reviewer records a decision and reason; schedules remain unchanged.'],
   ['Audit history', 'Transparency theme', 'Visible decisions and chat summaries; browser storage in demo, account database when connected. Not an independent audit trail.'],

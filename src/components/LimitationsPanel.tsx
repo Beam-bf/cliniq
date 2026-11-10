@@ -3,8 +3,8 @@ import Panel from '@/components/Panel';
 const LIMITATIONS = [
   'All figures are fictional test data. They do not describe any real clinic, patient, or region.',
   'No patient data is used or stored. Figures are aggregate weekly operational numbers only.',
-  'Agents are rule-based calculations, not machine learning. They follow fixed formulas that anyone can read in the code.',
-  'The forecast is a simple straight-line trend over the last 6 weeks, with one seasonal multiplier. It ignores many real drivers such as staff leave timing, demand shocks, and policy changes.',
+  'Agents are calculations based on rules, not machine learning. They follow fixed formulas that anyone can read in the code.',
+  'The forecast is a simple linear trend over the last 6 weeks, with one seasonal multiplier. It ignores many real drivers such as staff leave timing, demand shocks, and policy changes.',
   'Forecast trend consistency measures only how well a straight line fits six observations. It is not validated predictive accuracy or evidence of future clinical outcomes.',
   'Policy passages are matched by keyword against short quoted extracts. Matching is not a judgement of whether a passage supports a recommendation, so a reviewer must check each link.',
   'Only sources marked verified are used as evidence. Unverified items are shown for transparency and are never cited.',

@@ -14,8 +14,8 @@ interface Props { stageId: StageId; audit: AuditEntry[]; adjustments: ScenarioAd
 interface Message { question: string; response: ChatAnswer }
 const suggestions: Record<StageId, string[]> = {
   baseline: ['What does the forecast show?', 'Which routine tasks could be delegated?'],
-  'winter-surge': ['What waiting-time risks appear in winter?', 'What coordinator conflicts are flagged?'],
-  'specialist-leave': ['What does the forecast show during specialist leave?', 'What tele-pooling is proposed?'],
+  'winter-surge': ['What waiting time risks appear in winter?', 'What coordinator conflicts are flagged?'],
+  'specialist-leave': ['What does the forecast show during specialist leave?', 'What tele pooling is proposed?'],
 };
 
 export default function ChatPanel({ stageId, audit, adjustments, currentView, isOpen, disabled, accessToken, onAudit, onSource }: Props) {

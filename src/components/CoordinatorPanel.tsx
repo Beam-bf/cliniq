@@ -13,7 +13,7 @@ interface CoordinatorPanelProps {
 }
 
 const REVIEW_LABELS = {
-  forecast: 'Waiting-time forecast',
+  forecast: 'Waiting time forecast',
   routing: 'Referral destinations',
   'task-shifting': 'Routine task options',
   'tele-pooling': 'Specialist hour transfers',

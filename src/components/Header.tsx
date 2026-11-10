@@ -10,6 +10,6 @@ export default function Header({ stage }: { stage: StageId }) {
     </div>
     <h1>{scenario.label.replace(/^Stage \d /, '')}</h1>
     <p className="briefing-deck">{scenario.description}</p>
-    <div className="briefing-meta"><span>ClinIQ</span><span>Weekly aggregate figures</span><span>Human-approved planning</span></div>
+    <div className="briefing-meta"><span>ClinIQ</span><span>Weekly aggregate figures</span><span>Human reviewed planning</span></div>
   </header>;
 }

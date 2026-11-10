@@ -127,7 +127,7 @@ function App() {
           <button type="button" className="secondary-button export-button" onClick={exportBriefing} disabled={workspaceBlocked}><Download size={15} aria-hidden="true" />Export</button>
           <button type="button" className="account-button" onClick={() => go('account')}><UserRound size={17} aria-hidden="true" />{signedIn ? 'Account' : 'Sign in'}</button>
         </div></header>
-        <div className="scenario-context"><span>{SCENARIO_STAGES[stageId].label.replace(/^Stage \d /, '')}</span><p>{Object.keys(adjustments).length ? 'What-if changes applied' : 'Original scenario'}</p><a href="#planner">Change inputs →</a></div>
+        <div className="scenario-context"><span>{SCENARIO_STAGES[stageId].label.replace(/^Stage \d /, '')}</span><p>{Object.keys(adjustments).length ? 'Hypothetical changes applied' : 'Original scenario'}</p><a href="#planner">Change inputs →</a></div>
         <main id="main-content" tabIndex={-1} className="workspace-main">
           {auth.error && <p className="form-error" role="alert">{auth.error}</p>}
           {!signedIn && (statusStorageError || auditStorageError || chatStorageError || planStorageError) && <p className="form-error" role="alert">Browser storage is unavailable. Current changes are only in memory; export them before leaving.</p>}
