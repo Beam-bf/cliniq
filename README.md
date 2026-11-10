@@ -1,4 +1,4 @@
-# ClinI
+# ClinIQ
 
 An interactive specialist-capacity planning demo for six fictional Dubai clinics and four specialties. All operational data is fictional and aggregate. No patient information belongs in any field.
 
