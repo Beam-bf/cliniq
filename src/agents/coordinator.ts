@@ -2,6 +2,8 @@ import { AGENT_CATALOG } from '@/agents/catalog';
 import { FORECAST_HORIZON_WEEKS, MIN_HISTORY_WEEKS, describeLimitClause, forecastWait } from '@/agents/forecast';
 import { CLINIC_NAMES, SPECIALTY_LABELS } from '@/data/scenario';
 import type { AgentResult, CoordinatorReport, ScenarioStage } from '@/types';
+import type { PolicyAssessment } from '@/policy/knowledgeTypes';
+import { unavailablePolicyFinding } from '@/policy/knowledgeTypes';
 
 export function proposalIdFor(stage: ScenarioStage, result: AgentResult) {
   return `${stage.id}:${result.agent}`;
@@ -9,7 +11,8 @@ export function proposalIdFor(stage: ScenarioStage, result: AgentResult) {
 
 const pairKey = (clinicId: string, specialtyId: string) => `${clinicId}:${specialtyId}`;
 
-export function coordinateStage(stage: ScenarioStage, results: AgentResult[]): CoordinatorReport {
+export function coordinateStage(stage: ScenarioStage, results: AgentResult[], policy?: PolicyAssessment): CoordinatorReport {
+  if (policy?.stageId !== stage.id) policy = undefined;
   const recordsByPair = new Map(
     stage.records.map((record) => [pairKey(record.clinicId, record.specialtyId), record] as const),
   );
@@ -71,9 +74,15 @@ export function coordinateStage(stage: ScenarioStage, results: AgentResult[]): C
     }
   }
 
+  const findings = results.map(result => policy?.findings.find(finding => finding.agent === result.agent) ?? unavailablePolicyFinding(result.agent));
+  for (const finding of findings) {
+    if (finding.status === 'conflict') conflicts.push(`${AGENT_CATALOG[finding.agent].name}: ${finding.summary}`);
+    gaps.push(`${AGENT_CATALOG[finding.agent].name} policy review: ${finding.summary}`);
+  }
   return {
     conflicts,
     gaps,
-    proposals: results.map((result) => ({ ...result, id: proposalIdFor(stage, result) })),
+    ...(policy ? { policyAssessment: policy } : {}),
+    proposals: results.map((result, index) => ({ ...result, id: proposalIdFor(stage, result), policyReview: findings[index] })),
   };
 }

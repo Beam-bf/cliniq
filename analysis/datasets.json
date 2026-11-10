@@ -1,0 +1,12 @@
+{
+  "policy": "Data classes remain separate. Regional licensed counts, modelled demand, projections, synthetic clinic inputs and human review records are not interchangeable. No patient-level data is required.",
+  "datasets": [
+    { "path": "analysis/dubai-2024/source-data.json", "class": "public-statistical-snapshot", "publisher": "Dubai Health Authority", "referenceYear": 2024, "geography": "Emirate of Dubai", "records": 22, "derivedCopies": ["analysis/dubai-2024/results.json", "analysis/dubai-2024/results.csv"], "use": "Regional descriptive context; no clinic hours, waits or forecasting labels" },
+    { "path": "analysis/capacity-2022-2033/reviewed.json", "class": "reviewed-planning-baseline-and-projections", "publisher": "Dubai Health Authority", "years": [2022,2025,2030,2033], "geography": "Dubai", "use": "Only explicitly included rows may support numerical conclusions. Demand is modelled. No forecasting training." },
+    { "path": "src/data/scenario.ts", "class": "synthetic-clinic-scenarios-and-tasks", "geography": "Fictional Dubai clinics", "calendarDates": null, "use": "Existing rule-based software demonstration only; no real predictive accuracy claims" },
+    { "path": "knowledge/manifest.ts", "class": "versioned-public-policy-and-planning-documents", "use": "RAG context with exact citations; never automatic clinical authorization" },
+    { "source": "User-provided healthcare dataset csv.zip", "members": ["abu_dhabi_key_health_statistics_2010.csv", "dubai_health_statistics_2023.csv", "nhwa_category_wise_manpower_summary.csv", "uae_health_workforce_2022.csv"], "class": "collected-public-statistics-awaiting-source-verification", "use": "Not imported into agents or treated as verified training data" },
+    { "source": "User-provided healthcare dataset csv.zip", "member": "Dubai Health Investment Guide en2022221649.txt", "class": "unverified-planning-projections", "records": 63, "years": [2020,2025,2030], "use": "All rows excluded from numerical conclusions pending original publication/edition and table verification. All source URLs, supplies and demands are absent." },
+    { "source": "User-provided healthcare dataset csv.zip", "member": "doh_abu_dhabi_workforce_governance_policy.csv", "class": "unverified-policy-summary", "records": 6, "use": "Abu Dhabi jurisdiction; not ingested or applied as DHA clinical permissions" }
+  ]
+}

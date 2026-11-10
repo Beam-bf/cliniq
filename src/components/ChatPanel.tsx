@@ -4,6 +4,9 @@ import type { ChatAnswer, ChatAudit, ChatRequest, ChatTurn } from '@/chat/core';
 import type { AuditEntry, StageId } from '@/types';
 import type { ScenarioAdjustments } from '@/planning/scenarioPlanning';
 import { supabase } from '@/lib/supabase';
+import { searchPolicyKnowledge } from '@/policy/retrievalClient';
+import { KnowledgePassages } from '@/components/PolicyKnowledgeReview';
+import { isPolicyQuestion } from '@/policy/coverage';
 
 interface Props { stageId: StageId; audit: AuditEntry[]; adjustments: ScenarioAdjustments; currentView: string; isOpen: boolean; disabled: boolean;
   accessToken?: string; onAudit: (entry: ChatAudit) => void | Promise<void>; onSource: (id: string) => void }
@@ -42,7 +45,12 @@ export default function ChatPanel({ stageId, audit, adjustments, currentView, is
       recentAudit: audit.slice(0, 5).map(({ stage, agent, decision }) => ({ stage, agent, decision })) };
     try {
       let answer: ChatAnswer;
+      const previousPolicyQuery = messages[messages.length - 1]?.response.knowledge?.resolvedQuery;
+      const policyQuestion = isPolicyQuestion(payload.question, previousPolicyQuery);
       try {
+        if (policyQuestion) {
+          answer = await searchPolicyKnowledge(payload.question, previousPolicyQuery);
+        } else {
         if (supabase && !accessToken) throw new TypeError('Demo uses offline answers. Sign in for the connected assistant.');
         const result = await fetch('/api/chat', { method: 'POST',
           headers: { 'Content-Type': 'application/json', ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) }, body: JSON.stringify(payload), signal: AbortSignal.timeout(20000) });
@@ -52,9 +60,12 @@ export default function ChatPanel({ stageId, audit, adjustments, currentView, is
         if (!result.ok || !result.headers.get('Content-Type')?.includes('application/json')) throw new TypeError('Service unavailable');
         answer = await result.json();
         if (!['live', 'offline'].includes(answer.mode) || typeof answer.answer !== 'string' || !Array.isArray(answer.sourceIds)) throw new TypeError('Invalid response');
+        }
       } catch (failure) {
         if (failure instanceof Error && !(failure instanceof TypeError) && failure.name !== 'TimeoutError' && failure.name !== 'AbortError') throw failure;
-        answer = offlineAnswer(payload, supabase && !accessToken ? 'Demo mode uses offline templates. Sign in for the connected assistant.' : 'The chat endpoint is unavailable; using local offline templates.');
+        answer = policyQuestion
+          ? { mode: 'offline', sourceIds: [], answer: 'The policy knowledge service is unavailable. I cannot establish policy support. Human review is required.', notice: 'No vector-search result was simulated. Start the policy service or retry later.' }
+          : offlineAnswer(payload, supabase && !accessToken ? 'Demo mode uses offline templates. Sign in for the connected assistant.' : 'The chat endpoint is unavailable; using local offline templates.');
       }
       setMessages(current => [...current, { question: payload.question, response: answer }]);
       setQuestion('');
@@ -69,10 +80,11 @@ export default function ChatPanel({ stageId, audit, adjustments, currentView, is
       <ol className="chat-messages" aria-label="Chat messages" aria-live="polite" aria-relevant="additions">
         {messages.map((message, index) => <li key={index}>
           <p className="chat-user-message"><span className="sr-only">You: </span>{message.question}</p>
-          <div className="chat-assistant-message"><span className="chat-mode">{message.response.mode === 'offline' ? 'Offline mode · template answer' : 'Live mode · LLM answer'}</span>
+          <div className="chat-assistant-message"><span className="chat-mode">{message.response.knowledge ? 'Vector knowledge retrieval · exact source passages' : message.response.mode === 'offline' ? 'Offline mode · template answer' : 'Live mode · LLM answer'}</span>
           <p className="whitespace-pre-wrap">{message.response.answer}</p>
           {message.response.notice && <p className="chat-notice">{message.response.notice}</p>}
-          <div className="chat-citations">{message.response.sourceIds.map(id => <a key={id} href={`#evidence?source=${id}`} onClick={event => { event.preventDefault(); onSource(id); }}>{id}</a>)}</div></div>
+          {message.response.knowledge ? <details className="mt-3"><summary>Retrieved passages · {message.response.knowledge.evidence.length}</summary><KnowledgePassages evidence={message.response.knowledge.evidence} /></details>
+            : <div className="chat-citations">{message.response.sourceIds.map(id => <a key={id} href={`#evidence?source=${id}`} onClick={event => { event.preventDefault(); onSource(id); }}>{id}</a>)}</div>}</div>
         </li>)}
       </ol>
       {messages.length < 2 && <div className="chat-suggestions">{suggestions[stageId].map(text => <button key={text} type="button" disabled={busy || disabled} onClick={() => { setQuestion(text); void send(text); }}>{text} <span aria-hidden="true">↗</span></button>)}</div>}

@@ -3,13 +3,14 @@ import { useRef, useState } from 'react';
 import EmptyState from '@/components/EmptyState';
 import Panel from '@/components/Panel';
 import PolicyPassageList from '@/components/PolicyPassageList';
+import PolicyKnowledgeReview from '@/components/PolicyKnowledgeReview';
 import StatusBadge from '@/components/StatusBadge';
 import type { Decision, Proposal, ProposalStatus } from '@/types';
 
 interface ApprovalControlsProps {
   proposal: Proposal | null;
   status: ProposalStatus;
-  onDecide: (decision: Decision, reason: string) => void | Promise<void>;
+  onDecide: (decision: Decision, reason: string, policyAcknowledged: boolean) => void | Promise<void>;
   disabled?: boolean;
 }
 
@@ -17,6 +18,7 @@ export default function ApprovalControls({ proposal, status, onDecide, disabled 
   const [reason, setReason] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [policyAcknowledged, setPolicyAcknowledged] = useState(false);
   const lock = useRef(false);
 
   if (!proposal) {
@@ -34,8 +36,11 @@ export default function ApprovalControls({ proposal, status, onDecide, disabled 
       return;
     }
     if (reason.length > 2000) { setError('Keep your reason within 2,000 characters.'); return; }
+    if (decision === 'approved' && proposal.policyReview && !policyAcknowledged) {
+      setError('Review and acknowledge the Policy Agent flags before recording an approval.'); return;
+    }
     setError(null); lock.current = true; setBusy(true);
-    try { await onDecide(decision, reason.trim()); setReason(''); }
+    try { await onDecide(decision, reason.trim(), policyAcknowledged); setReason(''); }
     catch (failure) { setError(failure instanceof Error ? failure.message : 'The decision could not be recorded.'); }
     finally { lock.current = false; setBusy(false); }
   };
@@ -54,6 +59,7 @@ export default function ApprovalControls({ proposal, status, onDecide, disabled 
           <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Recommendation</p>
           <p className="mt-2 text-base font-semibold text-slate-900">{proposal.recommendation}</p>
           <p className="mt-3 text-sm text-slate-600">{proposal.summary}</p>
+          {proposal.policyReview && <div className="mt-4"><PolicyKnowledgeReview finding={proposal.policyReview} /></div>}
           <details className="review-evidence"><summary>Operational evidence · {proposal.evidence.length} observations</summary>
           <ul className="mt-3 list-inside list-disc space-y-2 text-sm text-slate-600">
             {proposal.evidence.map((item) => (
@@ -65,6 +71,8 @@ export default function ApprovalControls({ proposal, status, onDecide, disabled 
         </div>
 
         <div className="flex flex-col gap-4">
+          {proposal.policyReview && <label className="flex items-start gap-2 text-sm"><input type="checkbox" checked={policyAcknowledged} disabled={disabled || busy}
+            onChange={event => setPolicyAcknowledged(event.target.checked)} />I reviewed the policy evidence, unresolved applicability and review flags. This planning decision does not authorize clinical work.</label>}
           <label htmlFor="decision-reason" className="text-sm font-medium text-slate-700">
             Reason <span className="font-normal text-slate-500">(required)</span>
           </label>

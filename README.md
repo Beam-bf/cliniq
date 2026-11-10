@@ -1,5 +1,13 @@
 # HalaCapacity AI
 
+The healthcare policy knowledge-base increment is documented in
+[knowledge/README.md](knowledge/README.md). It adds verified document ingestion,
+local neural embeddings and a real PostgreSQL/pgvector retrieval service, with
+Policy Agent findings in the existing Coordinator, approvals and Ask Hala chat.
+The original clinic agents and scenarios remain intact. Start with
+`npm.cmd run kb:prepare-model`, `npm.cmd run kb:ingest`, then run
+`npm.cmd run kb:serve` alongside the existing `npm.cmd run dev`.
+
 An interactive specialist-capacity planning demo for **a capacity planner** responsible for comparing specialist availability across clinics. The prototype uses six fictional Dubai clinics and four specialties. All operational data is fictional and aggregate; no patient information belongs in any field.
 
 **Problem hypothesis:** the capacity planner needs to inspect uneven waiting-time pressure and available specialist hours together, compare rule-based options, and record a reasoned planning review.
@@ -18,6 +26,8 @@ Four interview questions to use later:
 Record actual responses accurately and obtain permission before quoting someone in the pitch. Until then, keep validation labelled pending.
 
 ## Real-data analysis
+
+Collected datasets are separated by provenance in [analysis/datasets.json](analysis/datasets.json). The [capacity-table review](analysis/capacity-2022-2033/README.md) verifies 40 submitted rows against original DHA Table 12, corrects four demand-year cells, and excludes 12 unresolved source discrepancies. Modelled demand and projections remain distinct from public statistical observations and the fictional clinic scenarios. No forecasting model is trained on these data.
 
 A first descriptive analysis uses Dubai Health Authority's published **2024** workforce and facility tables: [analysis report](analysis/dubai-2024/REPORT.md), [CSV](analysis/dubai-2024/results.csv), and [source/provenance](analysis/dubai-2024/source-data.json). Reproduce it with `node analysis/dubai-2024/analyze.mjs`. All three table totals and the physician subset reconcile. These are regional licensed-resource counts; they do not establish clinic waiting times or spare specialist hours. The website's fictional scenarios remain labelled as such.
 
@@ -42,7 +52,7 @@ npm ci
 npm run dev
 ```
 
-On PowerShell use `npm.cmd` if `npm.ps1` is blocked. No execution-policy change is needed. Dependencies are already installed; this increment adds no packages. Open the Local URL printed by Vite.
+On PowerShell use `npm.cmd` if `npm.ps1` is blocked. No execution-policy change is needed. The policy knowledge service adds the pinned dependencies described in `knowledge/README.md`. Open the Local URL printed by Vite.
 
 ```sh
 npm run lint
@@ -53,7 +63,7 @@ npm run backend:check
 npm run preview
 ```
 
-Vite serves the client only. Its dev and preview commands do not run Cloudflare Pages Functions; the assistant falls back to clearly labelled offline templates. `build` outputs `dist/` and does not deploy anything.
+Vite serves the client and proxies `/api/policy` to the local policy service when running. It does not run Cloudflare Pages Functions; ordinary LLM chat falls back to clearly labelled offline templates. Policy questions use real vector retrieval or explicitly report unavailable evidence. `build` outputs `dist/` and does not deploy anything.
 
 ## Working together
 
@@ -93,7 +103,7 @@ The application targets one capacity planner workflow. Team roles and shared sub
 
 Demo plans/statuses/history use `localStorage` keys prefixed `halacapacity.`. Signed-in workspaces use three account-specific tables: `planning_plans`, `planning_decisions`, and `planning_chat_audit`. Demo records are not imported into an account automatically, and account data is not copied back to demo storage when signing out. A failed account save surfaces an error instead of silently saving to demo storage.
 
-Current plan identity is the canonical set of changed inputs. Original scenarios retain the old proposal IDs for compatibility. What-if recommendations receive distinct IDs; restoring exactly the same inputs returns to that version's recorded reviews. This is intentional. The app stores the latest plan per scenario/account and does not yet provide named scenario branches, revision recovery or multi-device conflict resolution. Last successful save wins. History currently loads up to 500 decisions and 200 chat entries per account.
+Current plan identity is the canonical set of changed inputs. Every recommendation, including an original scenario, also includes the policy-corpus revision (or an unavailable marker). Historical unversioned reviews remain in History but do not approve the new policy version. Restoring exactly the same inputs and corpus returns to that version's recorded reviews. The app stores the latest plan per scenario/account and does not yet provide named scenario branches, revision recovery or multi-device conflict resolution. Last successful save wins. History currently loads up to 500 decisions and 200 chat entries per account.
 
 Decisions and chat rows permit select/insert for their owner; normal clients have no update/delete grants. These remain user-entered planning records, not independently verified or tamper-proof operational audit records. Administrators retain database access. All scheduling, staffing and booking actions remain outside this tool.
 
@@ -101,7 +111,7 @@ Decisions and chat rows permit select/insert for their owner; normal clients hav
 
 The actual server system instruction is [functions/_lib/chatPrompt.ts](functions/_lib/chatPrompt.ts). It explains the product, scenarios, fixed-rule algorithms, navigation, context schema, what-if limitations, evidence rules, read-only boundary, untrusted text and concise answer style. It is passed to the model on every live call.
 
-See [CHATBOT.md](CHATBOT.md) for retrieval, limits, provider configuration, and what the prompt can and cannot guarantee. The chatbot remains part of the website; live model configuration and further chatbot changes are deferred. The LLM does not generate the four capacity agents' results. No training or embeddings are involved.
+See [CHATBOT.md](CHATBOT.md) for retrieval, limits, provider configuration, and what the prompt can and cannot guarantee. The LLM does not generate the four capacity agents' results. No capacity-model training was added. The separate policy knowledge service now uses pretrained sentence embeddings and pgvector; live generative-model configuration remains separate.
 
 ## Demo steps
 
@@ -114,7 +124,7 @@ See [CHATBOT.md](CHATBOT.md) for retrieval, limits, provider configuration, and 
 
 ## Verification
 
-The suite includes **23 automated checks**, including actual PostgreSQL retirement tests through the development-only PGlite dependency, plus retrieval, chat, planning and repository tests. Retirement tests verify that personal access still works, historical rows are retained, former team Admin calls are denied, repeat retirement is safe, and old team chat requests are rejected. They do not prove that the retirement SQL has been applied to the hosted project.
+The application suite includes **33 tests/subtests**, including the original 29 and clinic-number, follow-up and input-boundary checks. The separate `npm run test:kb` suite includes **16 checks** for original-table review, actual PostgreSQL/vector retrieval, source provenance, unsupported questions, policy follow-ups and applicability boundaries after model/document preparation. Retirement tests verify that personal access still works, historical rows are retained, former team Admin calls are denied, repeat retirement is safe, and old team chat requests are rejected. They do not prove that the retirement SQL has been applied to the hosted project.
 
 An isolated installed-Chrome session verified page navigation, a real demo approval, input editing/recalculation, review invalidation after editing, the floating assistant, Escape close/focus return, contextual offline answers, clinical-input rejection, repeated source navigation/focus, JSON export content, persisted history after reload, scenario isolation and the unconfigured account state. The page and widget fit the tested 390×844 mobile viewport. Screenshots are in ignored `.browser-qa/`. No new browser/test packages were installed.
 
@@ -126,4 +136,4 @@ The user has demonstrated a signed-in workspace and applied inputs. Hosted role 
 
 Operational figures and task assignments are fictional. The four agents are fixed rules; forecast confidence indicates straight-line fit only. Changing referral/hour inputs does not model future clinical outcomes. Original policy verification flags are inherited, and a keyword match is not proof of policy support. ITU alignment remains a draft concept comparison, with unverified applicability/metrics labelled in the app.
 
-Next, apply the non-destructive role-retirement SQL and verify personal saving. User validation is pending; use the four questions above when a real contact is available. Further popup-chatbot, prompt and interactivity changes are deferred until requested. See [PRODUCT_ROADMAP.md](PRODUCT_ROADMAP.md).
+Role retirement and personal-plan reload were reported completed by the user; independent hosted permission, decision/chat, recovery and isolation checks remain. User validation is pending; use the four questions above when a real contact is available. See [PRODUCT_ROADMAP.md](PRODUCT_ROADMAP.md).

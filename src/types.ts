@@ -59,12 +59,14 @@ export interface AgentResult {
 
 export interface Proposal extends AgentResult {
   id: string;
+  policyReview?: import('./policy/knowledgeTypes').PolicyFinding;
 }
 
 export interface CoordinatorReport {
   conflicts: string[];
   gaps: string[];
   proposals: Proposal[];
+  policyAssessment?: import('./policy/knowledgeTypes').PolicyAssessment;
 }
 
 export interface PolicySource {

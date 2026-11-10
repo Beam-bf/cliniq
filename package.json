@@ -9,18 +9,28 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "backend:check": "node scripts/verify-backend.mjs",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.server.json",
-    "test": "node --import ./tests/register.mjs --test tests/*.test.mjs"
+    "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.server.json && tsc --noEmit -p tsconfig.knowledge.json",
+    "test": "node --import ./tests/register.mjs --test tests/*.test.mjs",
+    "kb:prepare-model": "node --import ./knowledge/register.mjs knowledge/cli.ts prepare-model",
+    "kb:ingest": "node --import ./knowledge/register.mjs knowledge/cli.ts ingest",
+    "kb:query": "node --import ./knowledge/register.mjs knowledge/cli.ts query",
+    "kb:status": "node --import ./knowledge/register.mjs knowledge/cli.ts status",
+    "kb:serve": "node --import ./knowledge/register.mjs knowledge/server.ts",
+    "test:kb": "node --import ./knowledge/register.mjs --test --test-concurrency=1 knowledge/tests/*.test.mjs"
   },
   "dependencies": {
+    "@electric-sql/pglite": "0.5.16",
+    "@electric-sql/pglite-pgvector": "0.0.17",
+    "@huggingface/transformers": "4.3.2",
     "@supabase/supabase-js": "^2.57.4",
     "lucide-react": "^0.446.0",
+    "pdfjs-dist": "6.5.438",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@electric-sql/pglite": "^0.5.16",
     "@eslint/js": "^9.9.1",
+    "@types/node": "24.3.1",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^5.1.1",

@@ -26,3 +26,4 @@ dist-ssr
 .npm-cache/
 .wrangler/
 .browser-qa/
+.knowledge/

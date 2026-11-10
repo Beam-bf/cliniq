@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Download, LayoutDashboard, SlidersHorizontal, ClipboardCheck, Library, History, CircleHelp, UserRound } from 'lucide-react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useAuth } from '@/hooks/useAuth';
+import { usePolicyAssessment } from '@/hooks/usePolicyAssessment';
 import { useAccountWorkspace } from '@/hooks/useAccountWorkspace';
 import { PAGES, useNavigation } from '@/hooks/useNavigation';
 import type { Page } from '@/hooks/useNavigation';
@@ -57,11 +58,13 @@ function App() {
   }, [stageId, rawAdjustments]);
   const revision = planRevision(adjustments);
   const stage = useMemo(() => applyAdjustments(stageId, adjustments), [stageId, adjustments]);
+  const policy = usePolicyAssessment(stageId, adjustments);
   const report = useMemo(() => {
-    const result = coordinateStage(stage, runAllAgents(stage));
+    const result = coordinateStage(stage, runAllAgents(stage), policy.assessment);
+    const policyVersion = policy.assessment?.kbRevision.slice(0, 12) ?? 'unavailable';
     return { ...result, proposals: result.proposals.map(proposal => ({ ...proposal,
-      id: revision === 'original' ? proposal.id : `${stageId}:${revision}:${proposal.agent}` })) };
-  }, [stage, stageId, revision]);
+      id: `${revision === 'original' ? proposal.id : `${stageId}:${revision}:${proposal.agent}`}:policy-${policyVersion}` })) };
+  }, [stage, stageId, revision, policy.assessment]);
   const selected = report.proposals.find(proposal => proposal.id === selectedId) ?? null;
   const selectedStatus = selected ? statuses[selected.id] ?? 'pending' : 'pending';
 
@@ -79,10 +82,17 @@ function App() {
     else setAdjustments(current => ({ ...current, [stageId]: valid }));
     setSelectedId(null); setNotice(signedIn ? 'Scenario saved to your account. Findings recalculated.' : 'Scenario applied to the browser demo. Findings recalculated.');
   }
-  async function recordDecision(decision: Decision, reason: string) {
+  async function recordDecision(decision: Decision, reason: string, policyAcknowledged: boolean) {
     if (!selected || workspaceBlocked) throw new Error('Select a recommendation in a loaded workspace.');
+    if (policy.loading) throw new Error('Wait for the policy evidence check to finish.');
+    if (decision === 'approved' && !policyAcknowledged) throw new Error('Acknowledge policy review flags before recording an approval.');
+    const policySnapshot = { assessmentId: policy.assessment?.id ?? null, kbRevision: policy.assessment?.kbRevision ?? null,
+      embeddingModel: policy.assessment?.embeddingModel ?? null, evaluatedAt: policy.assessment?.evaluatedAt ?? null, asOf: policy.assessment?.asOf ?? null,
+      policyAcknowledged, finding: selected.policyReview };
+    const evidence = `${selected.evidence.join('; ')} | Policy sources: ${passagesForAgent(selected.agent).map(({ source }) => source.id).join(', ') || 'none'} | Policy Agent snapshot: ${JSON.stringify(policySnapshot)}`;
+    if (evidence.length > 12000) throw new Error('The policy evidence snapshot exceeds the audit limit. Request changes rather than losing source provenance.');
     const entry: AuditEntry = { id: crypto.randomUUID(), time: new Date().toISOString(), stage: stageId, agent: selected.agent,
-      summary: selected.summary, evidence: `${selected.evidence.join('; ')} | Policy sources: ${passagesForAgent(selected.agent).map(({ source }) => source.id).join(', ') || 'none'}`,
+      summary: selected.summary, evidence,
       decision, reason, proposalId: selected.id, planRevision: revision };
     if (signedIn) await account.saveDecision(entry);
     else { setStatuses(current => ({ ...current, [selected.id]: decision })); setAudit(current => [entry, ...current]); }
@@ -128,7 +138,7 @@ function App() {
           {page === 'decisions' && <div className="decisions-page"><div className="page-heading"><h2>Review recommendations</h2></div>
             <div className="decision-workspace">
             <CoordinatorPanel report={report} statuses={statuses} selectedId={selectedId} onSelect={proposal => { setSelectedId(proposal.id); setNotice(null); if (window.matchMedia('(max-width: 1099px)').matches) requestAnimationFrame(() => document.getElementById('decision-detail')?.scrollIntoView({ block: 'start' })); }} />
-            <div id="decision-detail"><ApprovalControls key={selected?.id ?? 'none'} proposal={selected} status={selectedStatus} onDecide={recordDecision} disabled={workspaceBlocked || account.saving} /></div>
+            <div id="decision-detail"><ApprovalControls key={`${selected?.id ?? 'none'}:${policy.assessment?.id ?? 'unavailable'}`} proposal={selected} status={selectedStatus} onDecide={recordDecision} disabled={workspaceBlocked || account.saving || policy.loading} /></div>
             </div>
             <details className="progressive-details"><summary>How the four agents reached their findings</summary><div className="pt-5"><AgentCards proposals={report.proposals} statuses={statuses} /></div></details>
           </div>}

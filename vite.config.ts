@@ -6,7 +6,8 @@ import { fileURLToPath, URL } from 'node:url';
 export default defineConfig({
   plugins: [react()],
   server: {
-    watch: { ignored: ['**/.browser-qa/**', '**/.npm-cache/**'] },
+    watch: { ignored: ['**/.browser-qa/**', '**/.npm-cache/**', '**/.knowledge/**'] },
+    proxy: { '/api/policy': { target: 'http://127.0.0.1:8788', changeOrigin: true } },
   },
   resolve: {
     alias: {
